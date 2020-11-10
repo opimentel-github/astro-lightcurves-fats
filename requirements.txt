@@ -1,10 +1,11 @@
 numpy~=1.19.0
 matplotlib~=3.1.3
 scipy~=1.5.2
+Cython~=0.29.21
 #umap
 
 #eggs
--e git://github.com/opimentel-github/flaming-choripan.git#egg=flaming-choripan
--e git://github.com/opimentel-github/flaming-choripan.git#egg=astro-lightcurves-handler
--e git+https://git@github.com/alercebroker/P4J#egg=P4J
--e git+https://git@github.com/alercebroker/turbo-fats#egg=turbo-fats
+#-e git://github.com/opimentel-github/flaming-choripan.git#egg=flaming-choripan
+#-e git://github.com/opimentel-github/flaming-choripan.git#egg=astro-lightcurves-handler
+#-e git+https://git@github.com/alercebroker/P4J#egg=P4J
+#-e git+https://git@github.com/alercebroker/turbo-fats#egg=turbo-fats
