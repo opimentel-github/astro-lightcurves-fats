@@ -7,24 +7,27 @@ from .sn_parametric_model_computer import SNModelScipy, get_features_keys
 from turbofats import FeatureFunctionLib
 import numpy as np
 import pandas as pd
+from flamingchoripan.strings import get_list_chunks
 from flamingchoripan.progress_bars import ProgressBar
+from joblib import Parallel, delayed
 
 ###################################################################################################################################################
 
-def get_all_fat_features(lcdataset, lcset_name):
+def get_all_fat_features(lcdataset, lcset_name,
+	chunk_size=50,
+	n_jobs=C_.N_JOBS,
+	):
 	lcset = lcdataset[lcset_name]
 	band_names = lcset.band_names
-	lcobj_names = lcset.get_lcobj_names()
 	features_df = {}
-	bar = ProgressBar(len(lcobj_names))
-	for k,lcobj_name in enumerate(lcobj_names):
-		bar(lcobj_name)
-		lcobj = lcset[lcobj_name]
-		fats_df = get_fat_features(lcobj, band_names)
-		features_df[lcobj_name] = fats_df
-		if k>=5:
-			#break
-			pass
+	chunks = get_list_chunks(lcset.get_lcobj_names(), chunk_size)
+	bar = ProgressBar(len(chunks))
+	for kc,chunk in enumerate(chunks):
+		bar(f'chunck: {kc} - objs: {len(chunk)}')
+		results = Parallel(n_jobs=n_jobs)([delayed(get_fat_features)(lcset[lcobj_name], band_names) for lcobj_name in chunk])
+		for result, lcobj_name in zip(results, chunk):
+			features_df[lcobj_name] = result
+
 	bar.done()
 	return pd.DataFrame.from_dict(features_df, orient='index')
 

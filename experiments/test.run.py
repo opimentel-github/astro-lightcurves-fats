@@ -43,22 +43,9 @@ if __name__== '__main__':
 	print(lcdataset)
 
 	###################################################################################################################################################
-	import turbofats
+	from lcfats.extractors import get_all_fat_features
+	from lcfats.files import save_features_df
 
-	feature_space = turbofats.NewFeatureSpace(feature_list=['PeriodLS_v2', 'Period_fit_v2', 'Harmonics'])
-
-	detections_data = np.stack(
-		[
-			time.flatten(),
-			magnitude.flatten(),
-			error
-		],
-		axis=-1
-	)
-	detections = pd.DataFrame(
-		data=detections_data,
-		columns=['mjd', 'magpsf_corr', 'sigmapsf_corr'],
-		index=['asdf'] * len(detections_data)
-	)
-	feature_values = feature_space.calculate_features(detections)
-	print(feature_values)
+	for lcset_name in lcdataset.get_lcset_names():
+		df = get_all_fat_features(lcdataset, lcset_name)
+		save_features_df(df, lcdataset, lcset_name)
