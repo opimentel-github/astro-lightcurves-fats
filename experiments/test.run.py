@@ -47,5 +47,7 @@ if __name__== '__main__':
 	from lcfats.files import save_features_df
 
 	for lcset_name in lcdataset.get_lcset_names():
-		df = get_all_fat_features(lcdataset, lcset_name)
-		save_features_df(df, lcdataset, lcset_name)
+		df_x, df_y = get_all_fat_features(lcdataset, lcset_name)
+		save_rootdir = '../save'
+		save_features_df(df_x, lcdataset, lcset_name, 'x', save_rootdir)
+		save_features_df(df_y, lcdataset, lcset_name, 'y', save_rootdir)

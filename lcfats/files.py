@@ -7,8 +7,8 @@ from flamingchoripan.files import create_dir
 
 ###################################################################################################################################################
 
-def save_features_df(df, lcdataset, lcset_name):
+def save_features_df(df, lcdataset, lcset_name, extra_name, save_rootdir):
 	survey_name = lcdataset[lcset_name].survey
-	save_root_dir = f'../save/{survey_name}'
-	create_dir(save_root_dir)
-	df.to_parquet(f'{save_root_dir}/{lcset_name}.parquet')
+	new_save_rootdir = f'{save_rootdir}/{survey_name}'
+	create_dir(new_save_rootdir)
+	df.to_parquet(f'{new_save_rootdir}/{lcset_name}.{extra_name}.parquet')

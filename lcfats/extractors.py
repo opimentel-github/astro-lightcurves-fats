@@ -14,22 +14,26 @@ from joblib import Parallel, delayed
 ###################################################################################################################################################
 
 def get_all_fat_features(lcdataset, lcset_name,
-	chunk_size=50,
+	chunk_size=20,
 	n_jobs=C_.N_JOBS,
 	):
 	lcset = lcdataset[lcset_name]
 	band_names = lcset.band_names
 	features_df = {}
+	labels_df = {}
 	chunks = get_list_chunks(lcset.get_lcobj_names(), chunk_size)
 	bar = ProgressBar(len(chunks))
 	for kc,chunk in enumerate(chunks):
-		bar(f'chunck: {kc} - objs: {len(chunk)}')
+		bar(f'lcset_name: {lcset_name} - chunck: {kc} - objs: {len(chunk)}')
 		results = Parallel(n_jobs=n_jobs)([delayed(get_fat_features)(lcset[lcobj_name], band_names) for lcobj_name in chunk])
 		for result, lcobj_name in zip(results, chunk):
 			features_df[lcobj_name] = result
+			labels_df[lcobj_name] = {'c':lcset[lcobj_name].y}
 
 	bar.done()
-	return pd.DataFrame.from_dict(features_df, orient='index')
+	x = pd.DataFrame.from_dict(features_df, orient='index')
+	y = pd.DataFrame.from_dict(labels_df, orient='index')
+	return x, y
 
 def get_spm_features(lcobjb):
 	sne_model = SNModelScipy()
