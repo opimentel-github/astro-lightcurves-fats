@@ -34,7 +34,7 @@ if __name__== '__main__':
 	filedir = '../../astro-lightcurves-handler/save/alerceZTFv5.1/survey-alerceZTFv5.1_bands-gr_mode-onlySNe_kfid-0.splcds'
 	filedir = '../../astro-lightcurves-handler/save/alerceZTFv7.1/survey-alerceZTFv7.1_bands-gr_mode-onlySNe_kfid-0.splcds'
 	filedir = '../../sne-lightcurves-synthetic/save/alerceZTFv7.1/survey-alerceZTFv7.1_bands-gr_mode-onlySNe_kfid-0_method-curvefit.splcds'
-	
+
 	filedic = get_dict_from_filedir(filedir)
 	root_folder = filedic['*rootdir*']
 	cfilename = filedic['*cfilename*']
@@ -47,7 +47,8 @@ if __name__== '__main__':
 	from lcfats.extractors import get_all_fat_features
 	from lcfats.files import save_features_df
 
-	for lcset_name in lcdataset.get_lcset_names():
+	lcset_names = [lcset_name for lcset_name in lcdataset.get_lcset_names() if not 'raw' in lcset_name]
+	for lcset_name in lcset_names:
 		df_x, df_y = get_all_fat_features(lcdataset, lcset_name)
 		save_rootdir = '../save'
 		save_features_df(df_x, lcdataset, lcset_name, 'x', save_rootdir)
