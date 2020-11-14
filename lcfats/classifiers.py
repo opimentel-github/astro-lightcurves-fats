@@ -11,16 +11,18 @@ from flamingchoripan.datascience.metrics import get_all_metrics_c
 ###################################################################################################################################################
 
 def get_fitted_classifiers(lcdataset, train_lcset_name,
-	max_model_ids=20,
+	max_model_ids=50,
 	):
 	train_lcset = lcdataset[train_lcset_name]
+	class_names = train_lcset.class_names
 	root_folder = f'../save/{train_lcset.survey}'
+	class_brfc_weights_cdict = train_lcset.get_class_brfc_weights_cdict()
 	classifier_dict = {}
 	model_ids = list(range(0, max_model_ids))
 	for id in model_ids:
 		brf_kwargs = {
 			'max_depth':50,
-			#'weights':train_lcset.get_class_weights(),
+			#'class_weight':{kc:class_brfc_weights_cdict[c] for kc,c in enumerate(class_names)},
 			#'random_state':0,
 			'n_jobs':C_.N_JOBS,
 			#'verbose':1,
