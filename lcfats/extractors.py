@@ -10,11 +10,50 @@ import pandas as pd
 from flamingchoripan.strings import get_list_chunks
 from flamingchoripan.progress_bars import ProgressBar
 from joblib import Parallel, delayed
+from .mhps_extractor import MHPSExtractor
+
+###################################################################################################################################################
+
+def get_null_df(features_names):
+	return pd.DataFrame.from_dict({'':{f:np.nan for f in features_names}}, orient='index')
+
+def get_spm_features(lcobjb):
+	sne_model = SNModelScipy()
+	try:
+		spm_names = get_features_keys()
+		fit_error = sne_model.fit(lcobjb.days, lcobjb.obs, lcobjb.obse)
+		spm_params = sne_model.get_model_parameters()+[fit_error]
+		spm_params = {spm:spm_params[k] for k,spm in enumerate(spm_names)}
+		return pd.DataFrame.from_dict({'':spm_params}, orient='index')
+	except ValueError:
+		return get_null_df(spm_names)
+
+def get_mhps_features(lcobjb):
+	mhps_ex = MHPSExtractor()
+	try:
+		mag = lcobjb.obs
+		magerr = lcobjb.obse
+		time = lcobjb.days
+		mhps = mhps_ex.compute_feature_in_one_band_(mag, magerr, time)
+		return mhps
+	except IndexError:
+		return get_null_df(mhps_ex.get_features_keys())
+
+def get_fats_features(lcobjb):
+	#if len(lcobjb)==0
+	feature_space = turbofats.FeatureSpace(C_.OLD_FEATURES+C_.ALERCE_FEATURES)
+	detections_data = np.concatenate([lcobjb.days[...,None], lcobjb.obs[...,None], lcobjb.obse[...,None]], axis=-1)
+	detections = pd.DataFrame(
+		data=detections_data,
+		columns=['mjd', 'magpsf_corr', 'sigmapsf_corr'],
+		index=['']*len(detections_data)
+	)
+	return feature_space.calculate_features(detections)
 
 ###################################################################################################################################################
 
 def get_all_fat_features(lcdataset, lcset_name,
-	chunk_size=20,
+	chunk_size=C_.CHUNK_SIZE,
 	n_jobs=C_.N_JOBS,
 	):
 	lcset = lcdataset[lcset_name]
@@ -25,7 +64,7 @@ def get_all_fat_features(lcdataset, lcset_name,
 	bar = ProgressBar(len(chunks))
 	for kc,chunk in enumerate(chunks):
 		bar(f'lcset_name: {lcset_name} - chunck: {kc} - objs: {len(chunk)}')
-		results = Parallel(n_jobs=n_jobs)([delayed(get_fat_features)(lcset[lcobj_name], band_names) for lcobj_name in chunk])
+		results = Parallel(n_jobs=n_jobs)([delayed(get_features)(lcset[lcobj_name], band_names) for lcobj_name in chunk])
 		for result, lcobj_name in zip(results, chunk):
 			features_df[lcobj_name] = result
 			labels_df[lcobj_name] = {'c':lcset[lcobj_name].y}
@@ -35,37 +74,27 @@ def get_all_fat_features(lcdataset, lcset_name,
 	y = pd.DataFrame.from_dict(labels_df, orient='index')
 	return x, y
 
-def get_spm_features(lcobjb):
-	sne_model = SNModelScipy()
-	spm_names = get_features_keys()
-	try:
-		fit_error = sne_model.fit(lcobjb.days, lcobjb.obs, lcobjb.obse)
-		spm_params = sne_model.get_model_parameters()+[fit_error]
-	except ValueError:
-		spm_params = [np.nan]*len(spm_names)
-
-	spm_params = {spm:spm_params[k] for k,spm in enumerate(spm_names)}
-	return pd.DataFrame.from_dict({'':spm_params}, orient='index')
-
-def get_fat_features(lcobj, band_names):
+def get_features(lcobj, band_names):
 	df_bdict = {}
 	for b in band_names:
+		df_to_cat = []
 		lcobjb = lcobj.get_b(b)
-		feature_space = turbofats.FeatureSpace(C_.OLD_FEATURES+C_.ALERCE_FEATURES)
-
+		
 		### fats
-		detections_data = np.concatenate([lcobjb.days[...,None], lcobjb.obs[...,None], lcobjb.obse[...,None]], axis=-1)
-		detections = pd.DataFrame(
-			data=detections_data,
-			columns=['mjd', 'magpsf_corr', 'sigmapsf_corr'],
-			index=['']*len(detections_data)
-		)
-		features_df_b = feature_space.calculate_features(detections)
+		fats_df_b = get_fats_features(lcobjb)
+		df_to_cat.append(fats_df_b)
 
-		### SPM
+		### spm
 		spm_df_b = get_spm_features(lcobjb)
-		df_bdict[b] = pd.concat([features_df_b, spm_df_b], axis=1, sort=True)
-	
+		df_to_cat.append(spm_df_b)
+
+		### mhps
+		mhps_df_b = get_mhps_features(lcobjb)
+		df_to_cat.append(mhps_df_b)
+
+		### cat
+		df_bdict[b] = pd.concat(df_to_cat, axis=1, sort=True)
+
 	for b in band_names:
 		df_bdict[b].columns = [f'{c}_{b}' for c in df_bdict[b].columns]
 

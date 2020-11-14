@@ -33,7 +33,8 @@ if __name__== '__main__':
 
 	filedir = '../../astro-lightcurves-handler/save/alerceZTFv5.1/survey-alerceZTFv5.1_bands-gr_mode-onlySNe_kfid-0.splcds'
 	filedir = '../../astro-lightcurves-handler/save/alerceZTFv7.1/survey-alerceZTFv7.1_bands-gr_mode-onlySNe_kfid-0.splcds'
-
+	filedir = '../../sne-lightcurves-synthetic/save/alerceZTFv7.1/survey-alerceZTFv7.1_bands-gr_mode-onlySNe_kfid-0_method-curvefit.splcds'
+	
 	filedic = get_dict_from_filedir(filedir)
 	root_folder = filedic['*rootdir*']
 	cfilename = filedic['*cfilename*']
