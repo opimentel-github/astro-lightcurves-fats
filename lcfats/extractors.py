@@ -7,8 +7,8 @@ from .sn_parametric_model_computer import SNModelScipy, get_features_keys
 from turbofats import FeatureFunctionLib
 import numpy as np
 import pandas as pd
-from flamingchoripan.strings import get_list_chunks
 from flamingchoripan.progress_bars import ProgressBar
+from flamingchoripan.strings import get_list_chunks
 from joblib import Parallel, delayed
 from .mhps_extractor import MHPSExtractor
 
@@ -53,8 +53,8 @@ def get_fats_features(lcobjb):
 ###################################################################################################################################################
 
 def get_all_fat_features(lcdataset, lcset_name,
-	chunk_size=C_.CHUNK_SIZE,
 	n_jobs=C_.N_JOBS,
+	chunk_size=C_.CHUNK_SIZE,
 	):
 	lcset = lcdataset[lcset_name]
 	band_names = lcset.band_names
