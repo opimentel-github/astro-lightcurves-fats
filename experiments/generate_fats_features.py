@@ -10,7 +10,8 @@ if __name__== '__main__':
 	from flamingchoripan.prints import print_big_bar
 
 	parser = argparse.ArgumentParser('usage description')
-	parser.add_argument('-method',  type=str, default=None, help='method')
+	parser.add_argument('-method',  type=str, default='all', help='method')
+	#parser.add_argument('-set',  type=str, default='train', help='set')
 	main_args = parser.parse_args()
 	print_big_bar()
 
@@ -18,7 +19,7 @@ if __name__== '__main__':
 	from flamingchoripan.files import search_for_filedirs
 	from lchandler import C_
 
-	root_folder = '../../astro-lightcurves-handler/save'
+	root_folder = '../../surveys-save'
 	filedirs = search_for_filedirs(root_folder, fext=C_.EXT_SPLIT_LIGHTCURVE)
 
 	###################################################################################################################################################
@@ -31,13 +32,12 @@ if __name__== '__main__':
 		assert filename.split('.')[-1]==C_.EXT_SPLIT_LIGHTCURVE
 		return load_pickle(filename)
 
-	filedir = '../../astro-lightcurves-handler/save/alerceZTFv5.1/survey-alerceZTFv5.1_bands-gr_mode-onlySNe_kfid-0.splcds'
-	filedir = '../../astro-lightcurves-handler/save/alerceZTFv7.1/survey-alerceZTFv7.1_bands-gr_mode-onlySNe_kfid-0.splcds'
-	filedir = '../../sne-lightcurves-synthetic/save/alerceZTFv7.1/survey-alerceZTFv7.1_bands-gr_mode-onlySNe_kfid-0_method-curvefit.splcds'
+	filedir = f'../../surveys-save/alerceZTFv7.1/survey-alerceZTFv7.1_bands-gr_mode-onlySNe_method-{main_args.method}.splcds'
 
-	filedic = get_dict_from_filedir(filedir)
-	root_folder = filedic['*rootdir*']
-	cfilename = filedic['*cfilename*']
+	filedict = get_dict_from_filedir(filedir)
+	root_folder = filedict['*rootdir*']
+	cfilename = filedict['*cfilename*']
+	survey = filedict['survey']
 	lcdataset = load_lcdataset(filedir)
 	print(lcdataset['raw'].keys())
 	print(lcdataset['raw'].get_random_lcobj(False).keys())
@@ -45,11 +45,22 @@ if __name__== '__main__':
 
 	###################################################################################################################################################
 	from lcfats.extractors import get_all_fat_features
-	from lcfats.files import save_features_df
+	from lcfats.files import save_features
 
-	lcset_names = [lcset_name for lcset_name in lcdataset.get_lcset_names() if not 'raw' in lcset_name]
-	for lcset_name in lcset_names:
-		df_x, df_y = get_all_fat_features(lcdataset, lcset_name)
-		save_rootdir = '../save'
-		save_features_df(df_x, lcdataset, lcset_name, 'x', save_rootdir)
-		save_features_df(df_y, lcdataset, lcset_name, 'y', save_rootdir)
+	methods = main_args.method
+	if methods=='all':
+		methods = ['linear', 'bspline', 'uniformprior', 'curvefit', 'mcmc']
+
+	if isinstance(methods, str):
+		methods = [methods]
+
+	for method in methods:
+		lcset_names = [lcset_name for lcset_name in lcdataset.get_lcset_names() if not 'raw' in lcset_name] # ignore all raws because we are not using these
+		for lcset_name in lcset_names:
+			df_x, df_y = get_all_fat_features(lcdataset, lcset_name)
+			save_rootdir = f'../save/{survey}/{cfilename}'
+			save_filedir = f'{save_rootdir}/{lcset_name}.ftres'
+			save_features(df_x, df_y, save_filedir)
+
+
+
