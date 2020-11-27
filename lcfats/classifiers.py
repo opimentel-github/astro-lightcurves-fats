@@ -21,10 +21,16 @@ def get_fitted_classifiers(lcdataset, train_lcset_name,
 	model_ids = list(range(0, max_model_ids))
 	for id in model_ids:
 		brf_kwargs = {
-			'max_depth':50,
+			'n_estimators':500,
+            'max_features':'auto',
+            'max_depth':None,
 			#'class_weight':{kc:class_brfc_weights_cdict[c] for kc,c in enumerate(class_names)},
 			#'random_state':0,
+			'class_weight':None,
+			'criterion':'entropy',
 			'n_jobs':C_.N_JOBS,
+			'min_samples_split':2,
+            'min_samples_leaf':1,
 			#'verbose':1,
 		}
 		### fit
