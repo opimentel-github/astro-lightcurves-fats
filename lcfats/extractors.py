@@ -25,7 +25,7 @@ def get_spm_features(lcobjb):
 		spm_params = sne_model.get_model_parameters()+[fit_error]
 		spm_params = {spm:spm_params[k] for k,spm in enumerate(spm_names)}
 		return pd.DataFrame.from_dict({'':spm_params}, orient='index')
-	except ValueError:
+	except:
 		return get_null_df(spm_names)
 
 def get_mhps_features(lcobjb):
@@ -36,7 +36,7 @@ def get_mhps_features(lcobjb):
 		time = lcobjb.days
 		mhps = mhps_ex.compute_feature_in_one_band_(mag, magerr, time)
 		return mhps
-	except IndexError:
+	except:
 		return get_null_df(mhps_ex.get_features_keys())
 
 def get_fats_features(lcobjb):
@@ -63,7 +63,7 @@ def get_all_fat_features(lcdataset, lcset_name,
 	chunks = get_list_chunks(lcset.get_lcobj_names(), chunk_size)
 	bar = ProgressBar(len(chunks))
 	for kc,chunk in enumerate(chunks):
-		bar(f'lcset_name: {lcset_name} - chunck: {kc} - objs: {len(chunk)}')
+		bar(f'lcset_name: {lcset_name} - chunck: {kc} - chunk_size: {chunk_size}')
 		results = Parallel(n_jobs=n_jobs)([delayed(get_features)(lcset[lcobj_name], band_names) for lcobj_name in chunk])
 		for result, lcobj_name in zip(results, chunk):
 			features_df[lcobj_name] = result

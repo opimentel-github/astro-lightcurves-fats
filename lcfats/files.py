@@ -8,7 +8,9 @@ from flamingchoripan.files import create_dir
 ###################################################################################################################################################
 
 def load_features(load_filedir):
-	pass
+	x_df = pd.read_parquet(f'{load_filedir}.x') # parquet
+	y_df = pd.read_parquet(f'{load_filedir}.y') # parquet
+	return x_df, y_df
 
 def save_features(df_x, df_y, save_filedir):
 	create_dir('/'.join([s for s in save_filedir.split('/')[:-1]]))

@@ -7,37 +7,46 @@ from imblearn.ensemble import BalancedRandomForestClassifier
 from sklearn.ensemble import RandomForestClassifier
 from flamingchoripan.datascience.statistics import TopRank
 from flamingchoripan.datascience.metrics import get_all_metrics_c
+from flamingchoripan.progress_bars import ProgressBar
+from .files import load_features
 
 ###################################################################################################################################################
 
-def get_fitted_classifiers(lcdataset, train_lcset_name,
-	max_model_ids=50,
+def get_fitted_classifiers(lcdataset, train_lcset_name, load_rootdir,
+	max_model_ids=40,
+	remove_original_samples=False,
 	):
 	train_lcset = lcdataset[train_lcset_name]
 	class_names = train_lcset.class_names
-	root_folder = f'../save/{train_lcset.survey}'
 	class_brfc_weights_cdict = train_lcset.get_class_brfc_weights_cdict()
 	classifier_dict = {}
 	model_ids = list(range(0, max_model_ids))
+	bar = ProgressBar(len(model_ids))
 	for id in model_ids:
+		bar(f'training id: {id}')
 		brf_kwargs = {
-			'n_estimators':500,
-            'max_features':'auto',
-            'max_depth':None,
+			'n_jobs':C_.N_JOBS,
+			'n_estimators':200,
+            #'max_features':'auto',
+            #'max_depth':None,
 			#'class_weight':{kc:class_brfc_weights_cdict[c] for kc,c in enumerate(class_names)},
 			#'random_state':0,
 			'class_weight':None,
 			'criterion':'entropy',
-			'n_jobs':C_.N_JOBS,
-			'min_samples_split':2,
-            'min_samples_leaf':1,
+			#'min_samples_split':2,
+            #'min_samples_leaf':1,
 			#'verbose':1,
 		}
 		### fit
 		brf = BalancedRandomForestClassifier(**brf_kwargs)
 		#brf = RandomForestClassifier(**brf_kwargs)
-		x_df = pd.read_parquet(f'{root_folder}/{train_lcset_name}.x.parquet')
-		y_df = pd.read_parquet(f'{root_folder}/{train_lcset_name}.y.parquet')
+		x_df, y_df = load_features(f'{load_rootdir}/{train_lcset_name}.ftres')
+
+		if remove_original_samples:
+			to_drop = [i for i in list(x_df.index) if ('.' in i and i.split('.')[-1]=='0')]
+			x_df = x_df.drop(to_drop)
+			y_df = y_df.drop(to_drop)
+
 		brf.fit(x_df.values, y_df.values[...,0])
 
 		### rank
@@ -50,18 +59,16 @@ def get_fitted_classifiers(lcdataset, train_lcset_name,
 			'features':features,
 			'rank':rank,
 		}
-
+	bar.done()
 	return classifier_dict, model_ids
 
-def evaluate_classifiers(lcdataset, lcset_name, classifier_dict, model_ids):
+def evaluate_classifiers(lcdataset, lcset_name, classifier_dict, model_ids, load_rootdir):
 	lcset = lcdataset[lcset_name]
 	class_names = lcset.class_names
-	root_folder = f'../save/{lcset.survey}'
 	results_dict = {}
 	for id in model_ids:
 		brf = classifier_dict[id]['brf']
-		x_df = pd.read_parquet(f'{root_folder}/{lcset_name}.x.parquet')
-		y_df = pd.read_parquet(f'{root_folder}/{lcset_name}.y.parquet')
+		x_df, y_df = load_features(f'{load_rootdir}/{lcset_name}.ftres')
 		y_target = y_df.values[...,0]
 		y_pred = brf.predict(x_df.values)
 		scores_cdict, scores_dict, cm = get_all_metrics_c(y_pred, y_target, class_names, pred_is_onehot=False)

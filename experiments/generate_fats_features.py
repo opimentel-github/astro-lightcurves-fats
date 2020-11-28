@@ -58,7 +58,7 @@ if __name__== '__main__':
 		lcset_names = [lcset_name for lcset_name in lcdataset.get_lcset_names() if not 'raw' in lcset_name] # ignore all raws because we are not using these
 		for lcset_name in lcset_names:
 			df_x, df_y = get_all_fat_features(lcdataset, lcset_name)
-			save_rootdir = f'../save/{survey}/{cfilename}'
+			save_rootdir = f'../save/{survey}/{cfilename}/features'
 			save_filedir = f'{save_rootdir}/{lcset_name}.ftres'
 			save_features(df_x, df_y, save_filedir)
 
