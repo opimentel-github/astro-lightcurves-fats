@@ -99,5 +99,5 @@ def get_features(lcobj, band_names):
 		df_bdict[b].columns = [f'{c}_{b}' for c in df_bdict[b].columns]
 
 	features_df = pd.concat([df_bdict[b] for b in band_names], axis=1, sort=True)
-	features_df = features_df.fillna(C_.NAN_VALUE)
+	features_df = features_df.clip(-abs(C_.NAN_VALUE), abs(C_.NAN_VALUE)).fillna(C_.NAN_VALUE)
 	return features_df.to_dict(orient='index')['']

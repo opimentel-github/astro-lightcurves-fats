@@ -9,12 +9,13 @@ from flamingchoripan.datascience.statistics import TopRank
 from flamingchoripan.datascience.metrics import get_all_metrics_c
 from flamingchoripan.progress_bars import ProgressBar
 from .files import load_features
+import numpy as np
 
 ###################################################################################################################################################
 
 def get_fitted_classifiers(lcdataset, train_lcset_name, load_rootdir,
-	max_model_ids=40,
-	remove_original_samples=False,
+	max_model_ids=20,
+	remove_original_samples=0,
 	):
 	train_lcset = lcdataset[train_lcset_name]
 	class_names = train_lcset.class_names
@@ -26,7 +27,7 @@ def get_fitted_classifiers(lcdataset, train_lcset_name, load_rootdir,
 		bar(f'training id: {id}')
 		brf_kwargs = {
 			'n_jobs':C_.N_JOBS,
-			'n_estimators':200,
+			'n_estimators':500,
             #'max_features':'auto',
             #'max_depth':None,
 			#'class_weight':{kc:class_brfc_weights_cdict[c] for kc,c in enumerate(class_names)},
@@ -44,6 +45,7 @@ def get_fitted_classifiers(lcdataset, train_lcset_name, load_rootdir,
 
 		if remove_original_samples:
 			to_drop = [i for i in list(x_df.index) if ('.' in i and i.split('.')[-1]=='0')]
+			#to_drop = [i for i in list(x_df.index) if ('.' in i and i.split('.')[-1]!='0')]
 			x_df = x_df.drop(to_drop)
 			y_df = y_df.drop(to_drop)
 

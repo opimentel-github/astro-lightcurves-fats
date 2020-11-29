@@ -14,5 +14,7 @@ def load_features(load_filedir):
 
 def save_features(df_x, df_y, save_filedir):
 	create_dir('/'.join([s for s in save_filedir.split('/')[:-1]]))
+	df_x.columns = df_x.columns.astype(str)
+	df_y.columns = df_y.columns.astype(str)
 	df_x.to_parquet(f'{save_filedir}.x') # parquet
 	df_y.to_parquet(f'{save_filedir}.y') # parquet
