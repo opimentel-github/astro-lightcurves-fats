@@ -18,8 +18,8 @@ OLD_FEATURES = [
     'FluxPercentileRatioMid65',
     'FluxPercentileRatioMid80',
     'PercentDifferenceFluxPercentile',
-    'PeriodLS_v2',
-    'Period_fit_v2',
+    #'PeriodLS_v2', # slow?
+    #'Period_fit_v2', # slow?
     #'VariabilityIndex',
 ]
 
@@ -31,8 +31,8 @@ ALERCE_FEATURES = [
     'Con',
     'Eta_e',
     'ExcessVar',
-    'GP_DRW_sigma',
-    'GP_DRW_tau',
+    #'GP_DRW_sigma', # slow?
+    #'GP_DRW_tau', # slow?
     'Gskew',
     #'Harmonics', # slow?
     #(11) - Harmonics_mag_2_1
