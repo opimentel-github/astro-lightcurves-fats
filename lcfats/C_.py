@@ -34,20 +34,20 @@ ALERCE_FEATURES = [
     'GP_DRW_sigma',
     'GP_DRW_tau',
     'Gskew',
-    'Harmonics',
-    #(11) - Harmonics_mag_2_1: 0.06727560624790807
-    #(12) - Harmonics_mag_3_1: 0.1119856901696408
-    #(13) - Harmonics_mag_4_1: 0.12274118261108367
-    #(14) - Harmonics_mag_5_1: 0.05710346340791948
-    #(15) - Harmonics_mag_6_1: 0.06308390416802627
-    #(16) - Harmonics_mag_7_1: 0.005024974773290941
-    #(17) - Harmonics_mse_1: 0.04065159637204645
-    #(18) - Harmonics_phase_2_1: 2.0009756351458234
-    #(19) - Harmonics_phase_3_1: 6.04389265879566
-    #(20) - Harmonics_phase_4_1: 6.168103655501289
-    #(21) - Harmonics_phase_5_1: 1.8012355360321504
-    #(22) - Harmonics_phase_6_1: 2.4778906023433684
-    #(23) - Harmonics_phase_7_1: 0.04875669736539834
+    #'Harmonics', # slow?
+    #(11) - Harmonics_mag_2_1
+    #(12) - Harmonics_mag_3_1
+    #(13) - Harmonics_mag_4_1
+    #(14) - Harmonics_mag_5_1
+    #(15) - Harmonics_mag_6_1
+    #(16) - Harmonics_mag_7_1
+    #(17) - Harmonics_mse_1
+    #(18) - Harmonics_phase_2_1
+    #(19) - Harmonics_phase_3_1
+    #(20) - Harmonics_phase_4_1
+    #(21) - Harmonics_phase_5_1
+    #(22) - Harmonics_phase_6_1
+    #(23) - Harmonics_phase_7_1
     'IAR_phi',
     'LinearTrend',
     #'MHPS_PN_flag',
