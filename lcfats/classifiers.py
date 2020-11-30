@@ -15,7 +15,7 @@ import numpy as np
 
 def get_fitted_classifiers(lcdataset, train_lcset_name, load_rootdir,
 	max_model_ids=20,
-	remove_original_samples=0,
+	remove_real_samples=0,
 	):
 	train_lcset = lcdataset[train_lcset_name]
 	class_names = train_lcset.class_names
@@ -43,9 +43,8 @@ def get_fitted_classifiers(lcdataset, train_lcset_name, load_rootdir,
 		#brf = RandomForestClassifier(**brf_kwargs)
 		x_df, y_df = load_features(f'{load_rootdir}/{train_lcset_name}.ftres')
 
-		if remove_original_samples:
+		if remove_real_samples:
 			to_drop = [i for i in list(x_df.index) if ('.' in i and i.split('.')[-1]=='0')]
-			#to_drop = [i for i in list(x_df.index) if ('.' in i and i.split('.')[-1]!='0')]
 			x_df = x_df.drop(to_drop)
 			y_df = y_df.drop(to_drop)
 
@@ -78,6 +77,7 @@ def evaluate_classifiers(lcdataset, lcset_name, classifier_dict, model_ids, load
 			'lcset_name':lcset_name,
 			'class_names':class_names,
 			'cm':cm,
+			'accu':scores_dict['accuracy'],
 			'f1score':scores_dict['f1score'],
 		}
 
