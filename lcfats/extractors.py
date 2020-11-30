@@ -64,7 +64,7 @@ def get_all_fat_features(lcdataset, lcset_name,
 	bar = ProgressBar(len(chunks))
 	for kc,chunk in enumerate(chunks):
 		bar(f'lcset_name: {lcset_name} - chunck: {kc} - chunk_size: {chunk_size}')
-		results = Parallel(n_jobs=n_jobs)([delayed(get_features)(lcset[lcobj_name], band_names) for lcobj_name in chunk])
+		results = Parallel(n_jobs=n_jobs, backend='threading')([delayed(get_features)(lcset[lcobj_name], band_names) for lcobj_name in chunk])
 		for result, lcobj_name in zip(results, chunk):
 			features_df[lcobj_name] = result
 			labels_df[lcobj_name] = {'c':lcset[lcobj_name].y}
