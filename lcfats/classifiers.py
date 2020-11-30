@@ -79,6 +79,8 @@ def evaluate_classifiers(lcdataset, lcset_name, classifier_dict, model_ids, load
 			'cm':cm,
 			'accu':scores_dict['accuracy'],
 			'f1score':scores_dict['f1score'],
+			'features':classifier_dict[id]['features'],
+			'rank':classifier_dict[id]['rank'],
 		}
 
 	return results_dict
