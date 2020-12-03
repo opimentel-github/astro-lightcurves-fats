@@ -61,10 +61,10 @@ def get_synth_objs(obj_r, objs_s,
 
 def plot_projections(maps2d_dict,
 	target_class=None,
-	figsize:tuple=(10,8),
+	figsize:tuple=(12,10),
 	alpha=0.75,
 
-	max_samples=3e3,
+	max_samples=4e3,
 	max_real_samples:int=250,
 	max_synth_samples:int=2,
 	):
@@ -81,7 +81,7 @@ def plot_projections(maps2d_dict,
 				plot_projections_c(ax, maps2d_dict, c, 'k', max_samples=max_samples, alpha=0.5)
 
 	method_name = maps2d_dict['method_name']
-	title = f'{method_name} projection of FATS features'
+	title = f'{method_name}'
 	#title += f'survey: {lcset_train.survey} - set: {set_name_train}'
 	ax.legend()
 	ax.set_title(title)
@@ -94,7 +94,7 @@ def get_standar_style(color, alpha):
 	return {
 		'facecolors':[color],
 		#'edgecolors':'k',
-		's':10,
+		's':8,
 		'alpha':alpha,
 		'marker':'o',
 		'lw':1.5,

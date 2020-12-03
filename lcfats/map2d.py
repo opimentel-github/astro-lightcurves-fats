@@ -75,7 +75,8 @@ def get_fitted_maps2d(lcdataset, lcset_name, load_rootdir,
 		pca = PCA(n_components=pre_out_dims)
 		map_obj = UMAP(n_components=out_dims, **map_kwargs)
 		#method_name = '$\\text{PCA}_{'+str(pre_out_dims)+'}\\to\\text{UMAP}_{'+str(out_dims)+'}$'
-		method_name = '$PCA_{'+str(pre_out_dims)+'} + UMAP_{'+str(out_dims)+'}$'
+		method_name = '$PCA_{'+str(pre_out_dims)+'} + UMAP_{'+str(out_dims)+'}$ projection of FATS features\n'
+		method_name += f'metric: {metric} - min-dist: {min_dist:.3f} - n-neighbors: {int(n_neighbors)}'
 
 		map_x = map_obj.fit_transform(pca.fit_transform(x), y=y)
 
