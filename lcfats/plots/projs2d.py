@@ -62,7 +62,9 @@ def get_synth_objs(obj_r, objs_s,
 def plot_projections(maps2d_dict,
 	target_class=None,
 	figsize:tuple=(10,8),
-	max_samples=1e3,
+	alpha=0.75,
+
+	max_samples=3e3,
 	max_real_samples:int=250,
 	max_synth_samples:int=2,
 	):
@@ -71,12 +73,12 @@ def plot_projections(maps2d_dict,
 	for kc,c in enumerate(class_names):
 		ax = axs
 		if target_class is None:
-			plot_projections_c(ax, maps2d_dict, c)
+			plot_projections_c(ax, maps2d_dict, c, max_samples=max_samples, alpha=alpha)
 		else:
 			if c==target_class:
-				plot_net_projections_c(ax, maps2d_dict, c)
+				plot_net_projections_c(ax, maps2d_dict, c, alpha=alpha)
 			else:
-				plot_projections_c(ax, maps2d_dict, c, 'k', alpha=0.5)
+				plot_projections_c(ax, maps2d_dict, c, 'k', max_samples=max_samples, alpha=0.5)
 
 	method_name = maps2d_dict['method_name']
 	title = f'{method_name} projection of FATS features'
@@ -121,7 +123,7 @@ def plot_projections_c(ax, maps2d_dict, c,
 
 def plot_net_projections_c(ax, maps2d_dict, c,
 	alpha=0.9,
-	max_real_samples:int=150,
+	max_real_samples:int=200,
 	max_synth_samples:int=1,
 	):
 	lcobj_names = maps2d_dict['lcobj_names']
