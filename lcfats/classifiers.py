@@ -19,7 +19,6 @@ def get_fitted_classifiers(lcdataset, train_lcset_name, load_rootdir,
 	):
 	train_lcset = lcdataset[train_lcset_name]
 	class_names = train_lcset.class_names
-	class_brfc_weights_cdict = train_lcset.get_class_brfc_weights_cdict()
 	classifier_dict = {}
 	model_ids = list(range(0, max_model_ids))
 	bar = ProgressBar(len(model_ids))
@@ -28,14 +27,13 @@ def get_fitted_classifiers(lcdataset, train_lcset_name, load_rootdir,
 		brf_kwargs = {
 			'n_jobs':C_.N_JOBS,
 			'n_estimators':500,
-            #'max_features':'auto',
-            #'max_depth':None,
-			#'class_weight':{kc:class_brfc_weights_cdict[c] for kc,c in enumerate(class_names)},
+			#'max_features':'auto',
+			#'max_depth':None,
 			#'random_state':0,
 			'class_weight':None,
 			'criterion':'entropy',
 			#'min_samples_split':2,
-            #'min_samples_leaf':1,
+			#'min_samples_leaf':1,
 			#'verbose':1,
 		}
 		### fit
@@ -77,8 +75,8 @@ def evaluate_classifiers(lcdataset, lcset_name, classifier_dict, model_ids, load
 			'lcset_name':lcset_name,
 			'class_names':class_names,
 			'cm':cm,
-			'accu':scores_dict['accuracy'],
-			'f1score':scores_dict['f1score'],
+			'accu':scores_dict['b-accuracy'],
+			'f1score':scores_dict['b-f1score'],
 			'features':classifier_dict[id]['features'],
 			'rank':classifier_dict[id]['rank'],
 		}

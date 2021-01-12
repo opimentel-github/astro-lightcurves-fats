@@ -11,7 +11,6 @@ if __name__== '__main__':
 
 	parser = argparse.ArgumentParser('usage description')
 	parser.add_argument('-method',  type=str, default='all', help='method')
-	#parser.add_argument('-set',  type=str, default='train', help='set')
 	main_args = parser.parse_args()
 	print_big_bar()
 
@@ -32,29 +31,29 @@ if __name__== '__main__':
 		assert filename.split('.')[-1]==C_.EXT_SPLIT_LIGHTCURVE
 		return load_pickle(filename)
 
-	filedir = f'../../surveys-save/alerceZTFv7.1/survey=alerceZTFv7.1°bands=gr°mode=onlySNe°method={main_args.method}.splcds'
-
-	filedict = get_dict_from_filedir(filedir)
-	root_folder = filedict['*rootdir*']
-	cfilename = filedict['*cfilename*']
-	survey = filedict['survey']
-	lcdataset = load_lcdataset(filedir)
-	print(lcdataset['raw'].keys())
-	print(lcdataset['raw'].get_random_lcobj(False).keys())
-	print(lcdataset)
-
-	###################################################################################################################################################
-	from lcfats.extractors import get_all_fat_features
-	from lcfats.files import save_features
-
 	methods = main_args.method
 	if methods=='all':
-		methods = ['linear', 'bspline', 'uniformprior', 'curvefit', 'mcmc']
+		methods = ['linear', 'bspline', 'curvefit', 'mcmc']
 
 	if isinstance(methods, str):
 		methods = [methods]
 
 	for method in methods:
+		filedir = f'../../surveys-save/alerceZTFv7.1/survey=alerceZTFv7.1°bands=gr°mode=onlySNe°method={method}.splcds'
+
+		filedict = get_dict_from_filedir(filedir)
+		root_folder = filedict['*rootdir*']
+		cfilename = filedict['*cfilename*']
+		survey = filedict['survey']
+		lcdataset = load_lcdataset(filedir)
+		print(lcdataset['raw'].keys())
+		print(lcdataset['raw'].get_random_lcobj(False).keys())
+		print(lcdataset)
+
+		###################################################################################################################################################
+		from lcfats.extractors import get_all_fat_features
+		from lcfats.files import save_features
+	
 		lcset_names = [lcset_name for lcset_name in lcdataset.get_lcset_names() if not 'raw' in lcset_name] # ignore all raws because we are not using these
 		for lcset_name in lcset_names:
 			df_x, df_y = get_all_fat_features(lcdataset, lcset_name)
