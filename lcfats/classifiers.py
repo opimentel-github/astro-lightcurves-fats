@@ -26,14 +26,14 @@ def get_fitted_classifiers(lcdataset, train_lcset_name, load_rootdir,
 		bar(f'training id: {id}')
 		brf_kwargs = {
 			'n_jobs':C_.N_JOBS,
-			'n_estimators':500,
+			'n_estimators':1000,
+			'max_depth':None,
 			#'max_features':'auto',
-			#'max_depth':None,
-			#'random_state':0,
+			'random_state':0,
 			'class_weight':None,
-			'criterion':'entropy',
-			#'min_samples_split':2,
-			#'min_samples_leaf':1,
+			'criterion':'gini',
+			'min_samples_split':2,
+			'min_samples_leaf':1,
 			#'verbose':1,
 		}
 		### fit
