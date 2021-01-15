@@ -6,7 +6,7 @@ import pandas as pd
 from imblearn.ensemble import BalancedRandomForestClassifier
 from sklearn.ensemble import RandomForestClassifier
 from flamingchoripan.datascience.statistics import TopRank
-from flamingchoripan.datascience.metrics import get_all_metrics_c
+from flamingchoripan.datascience.metrics import get_multiclass_metrics
 from flamingchoripan.progress_bars import ProgressBar
 from .files import load_features
 import numpy as np
@@ -69,13 +69,13 @@ def evaluate_classifiers(lcdataset, lcset_name, classifier_dict, model_ids, load
 		x_df, y_df = load_features(f'{load_rootdir}/{lcset_name}.ftres')
 		y_target = y_df.values[...,0]
 		y_pred = brf.predict(x_df.values)
-		scores_cdict, scores_dict, cm = get_all_metrics_c(y_pred, y_target, class_names, pred_is_onehot=False)
+		metrics_cdict, metrics_dict, cm = get_multiclass_metrics(y_pred, y_target, class_names, pred_is_onehot=False)
 		results_dict[id] = {
 			'lcset_name':lcset_name,
 			'class_names':class_names,
+			'metrics_cdict':metrics_cdict,
+			'metrics_dict':metrics_dict,
 			'cm':cm,
-			'accu':scores_dict['b-accuracy'],
-			'f1score':scores_dict['b-f1score'],
 			'features':classifier_dict[id]['features'],
 			'rank':classifier_dict[id]['rank'],
 		}
