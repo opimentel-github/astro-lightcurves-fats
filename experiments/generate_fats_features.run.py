@@ -54,7 +54,7 @@ if __name__== '__main__':
 		from lcfats.extractors import get_all_fat_features
 		from lcfats.files import save_features
 	
-		lcset_names = [lcset_name for lcset_name in lcdataset.get_lcset_names() if not 'raw' in lcset_name] # ignore all raws because we are not using these
+		lcset_names = [lcset_name for lcset_name in lcdataset.get_lcset_names() if not 'raw' in lcset_name and len(lcdataset[lcset_name])>0] # ignore all raws because we are not using these
 		for lcset_name in lcset_names:
 			df_x, df_y = get_all_fat_features(lcdataset, lcset_name)
 			save_rootdir = f'../save/{survey}/{cfilename}/features'
