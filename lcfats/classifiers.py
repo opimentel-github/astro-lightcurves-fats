@@ -40,7 +40,7 @@ def get_fitted_classifiers(lcdataset, train_lcset_name, load_rootdir,
 		#brf = RandomForestClassifier(**brf_kwargs)
 		x_df, y_df = load_features(f'{load_rootdir}/{train_lcset_name}.ftres')
 
-		if real_repeat:
+		if add_real_samples:
 			real_lcset_name = train_lcset_name.split('.')[0]
 			rx_df, ry_df = load_features(f'{load_rootdir}/{real_lcset_name}.ftres')
 			x_df = pd.concat([x_df]+[rx_df]*real_repeat, axis=0)
