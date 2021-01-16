@@ -15,7 +15,8 @@ import numpy as np
 
 def get_fitted_classifiers(lcdataset, train_lcset_name, load_rootdir,
 	max_model_ids=20,
-	remove_real_samples=0,
+	add_real_samples=False,
+	real_repeat=64,
 	):
 	train_lcset = lcdataset[train_lcset_name]
 	class_names = train_lcset.class_names
@@ -23,7 +24,6 @@ def get_fitted_classifiers(lcdataset, train_lcset_name, load_rootdir,
 	model_ids = list(range(0, max_model_ids))
 	bar = ProgressBar(len(model_ids))
 	for id in model_ids:
-		bar(f'training id: {id}')
 		brf_kwargs = {
 			'n_jobs':C_.N_JOBS,
 			'n_estimators':1000,
@@ -40,11 +40,13 @@ def get_fitted_classifiers(lcdataset, train_lcset_name, load_rootdir,
 		#brf = RandomForestClassifier(**brf_kwargs)
 		x_df, y_df = load_features(f'{load_rootdir}/{train_lcset_name}.ftres')
 
-		if remove_real_samples:
-			to_drop = [i for i in list(x_df.index) if ('.' in i and i.split('.')[-1]=='0')]
-			x_df = x_df.drop(to_drop)
-			y_df = y_df.drop(to_drop)
+		if real_repeat:
+			real_lcset_name = train_lcset_name.split('.')[0]
+			rx_df, ry_df = load_features(f'{load_rootdir}/{real_lcset_name}.ftres')
+			x_df = pd.concat([x_df]+[rx_df]*real_repeat, axis=0)
+			y_df = pd.concat([y_df]+[ry_df]*real_repeat, axis=0)
 
+		bar(f'training id: {id} - samples: {len(y_df)}')
 		brf.fit(x_df.values, y_df.values[...,0])
 
 		### rank
