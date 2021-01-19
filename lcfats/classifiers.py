@@ -26,7 +26,7 @@ def get_fitted_classifiers(lcdataset, train_lcset_name, load_rootdir,
 	for id in model_ids:
 		brf_kwargs = {
 			'n_jobs':C_.N_JOBS,
-			'n_estimators':250,
+			'n_estimators':500,
 			#'max_depth':None,
 			#'max_features':'auto',
 			#'class_weight':None,
