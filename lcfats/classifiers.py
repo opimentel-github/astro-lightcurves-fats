@@ -34,7 +34,7 @@ def get_fitted_classifiers(lcdataset, train_lcset_name, load_rootdir,
 			#'min_samples_split':2,
 			#'min_samples_leaf':1,
 			#'verbose':1,
-			'max_samples':100,
+			'max_samples':100, # REALLY IMPORTANT PARAMETER
 		}
 		### fit
 		brf = BalancedRandomForestClassifier(**brf_kwargs)
