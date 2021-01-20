@@ -16,7 +16,7 @@ import numpy as np
 def get_fitted_classifiers(lcdataset, train_lcset_name, load_rootdir,
 	max_model_ids=20,
 	add_real_samples=False,
-	real_repeat=64,
+	real_repeat=16,
 	):
 	train_lcset = lcdataset[train_lcset_name]
 	class_names = train_lcset.class_names
@@ -26,14 +26,15 @@ def get_fitted_classifiers(lcdataset, train_lcset_name, load_rootdir,
 	for id in model_ids:
 		brf_kwargs = {
 			'n_jobs':C_.N_JOBS,
-			'n_estimators':500,
-			#'max_depth':None,
+			'n_estimators':50,
+			#'max_depth':20,
 			#'max_features':'auto',
 			#'class_weight':None,
-			'criterion':'entropy',
+			#'criterion':'entropy',
 			#'min_samples_split':2,
 			#'min_samples_leaf':1,
 			#'verbose':1,
+			'max_samples':100,
 		}
 		### fit
 		brf = BalancedRandomForestClassifier(**brf_kwargs)
@@ -42,11 +43,17 @@ def get_fitted_classifiers(lcdataset, train_lcset_name, load_rootdir,
 
 		if add_real_samples:
 			real_lcset_name = train_lcset_name.split('.')[0]
+			#print(real_lcset_name)
 			rx_df, ry_df = load_features(f'{load_rootdir}/{real_lcset_name}.ftres')
+			#rx_df = rx_df
+			#ry_df = ry_df
+			#x_df = pd.concat([rx_df]*real_repeat, axis=0, ignore_index=True)
+			#y_df = pd.concat([ry_df]*real_repeat, axis=0, ignore_index=True)
 			x_df = pd.concat([x_df]+[rx_df]*real_repeat, axis=0)
 			y_df = pd.concat([y_df]+[ry_df]*real_repeat, axis=0)
 
-		bar(f'training id: {id} - samples: {len(y_df)}')
+		bar(f'training id: {id} - samples: {len(y_df)} - features: {len(x_df.columns)}')
+		#print(x_df.columns, x_df)
 		brf.fit(x_df.values, y_df.values[...,0])
 
 		### rank

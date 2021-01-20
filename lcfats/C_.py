@@ -23,6 +23,14 @@ OLD_FEATURES = [
     #'VariabilityIndex',
 ]
 
+ALERCE_SPM_FEATURES = [
+    'SF_ML_amplitude',
+    'IAR_phi',
+    'LinearTrend',
+    #'GP_DRW_sigma', # slow?
+    #'GP_DRW_tau', # slow?
+]
+
 ALERCE_FEATURES = [
     'Amplitude',
     'AndersonDarling',
