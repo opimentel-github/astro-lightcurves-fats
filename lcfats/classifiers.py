@@ -16,7 +16,7 @@ import numpy as np
 def get_fitted_classifiers(lcdataset, train_lcset_name, load_rootdir,
 	max_model_ids=20,
 	add_real_samples=False,
-	real_repeat=16,
+	real_repeat=32,
 	):
 	train_lcset = lcdataset[train_lcset_name]
 	class_names = train_lcset.class_names
@@ -26,7 +26,7 @@ def get_fitted_classifiers(lcdataset, train_lcset_name, load_rootdir,
 	for id in model_ids:
 		brf_kwargs = {
 			'n_jobs':C_.N_JOBS,
-			'n_estimators':50,
+			'n_estimators':100,
 			#'max_depth':20,
 			#'max_features':'auto',
 			#'class_weight':None,
@@ -40,17 +40,21 @@ def get_fitted_classifiers(lcdataset, train_lcset_name, load_rootdir,
 		brf = BalancedRandomForestClassifier(**brf_kwargs)
 		#brf = RandomForestClassifier(**brf_kwargs)
 		x_df, y_df = load_features(f'{load_rootdir}/{train_lcset_name}.ftres')
+		is_real_lcset = not '.' in train_lcset_name
 
-		if add_real_samples:
-			real_lcset_name = train_lcset_name.split('.')[0]
-			#print(real_lcset_name)
-			rx_df, ry_df = load_features(f'{load_rootdir}/{real_lcset_name}.ftres')
-			#rx_df = rx_df
-			#ry_df = ry_df
-			#x_df = pd.concat([rx_df]*real_repeat, axis=0, ignore_index=True)
-			#y_df = pd.concat([ry_df]*real_repeat, axis=0, ignore_index=True)
-			x_df = pd.concat([x_df]+[rx_df]*real_repeat, axis=0)
-			y_df = pd.concat([y_df]+[ry_df]*real_repeat, axis=0)
+		if is_real_lcset:
+			x_df = pd.concat([x_df]*real_repeat*2, axis=0)
+			y_df = pd.concat([y_df]*real_repeat*2, axis=0)
+		else:
+			if add_real_samples:
+				real_lcset_name = train_lcset_name.split('.')[0]
+				#print(real_lcset_name)
+				rx_df, ry_df = load_features(f'{load_rootdir}/{real_lcset_name}.ftres')
+				x_df = pd.concat([x_df]+[rx_df]*real_repeat, axis=0)
+				y_df = pd.concat([y_df]+[ry_df]*real_repeat, axis=0)
+			else:
+				x_df = pd.concat([x_df]*2, axis=0)
+				y_df = pd.concat([y_df]*2, axis=0)
 
 		bar(f'training id: {id} - samples: {len(y_df)} - features: {len(x_df.columns)}')
 		#print(x_df.columns, x_df)
