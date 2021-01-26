@@ -33,7 +33,8 @@ if __name__== '__main__':
 
 	methods = main_args.method
 	if methods=='all':
-		methods = ['linear', 'bspline', 'curvefit', 'mcmc']
+		methods = ['linear-nostw', 'bspline-nostw', 'curvefit-nostw', 'mcmc-nostw', 'curvefit', 'mcmc']
+		methods = ['curvefit-nostw', 'mcmc-nostw', 'curvefit', 'mcmc']
 
 	if isinstance(methods, str):
 		methods = [methods]

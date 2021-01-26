@@ -16,7 +16,7 @@ import numpy as np
 def get_fitted_classifiers(lcdataset, train_lcset_name, load_rootdir,
 	max_model_ids=20,
 	add_real_samples=False,
-	real_repeat=32,
+	real_repeat=64,
 	):
 	train_lcset = lcdataset[train_lcset_name]
 	class_names = train_lcset.class_names
@@ -34,7 +34,9 @@ def get_fitted_classifiers(lcdataset, train_lcset_name, load_rootdir,
 			#'min_samples_split':2,
 			#'min_samples_leaf':1,
 			#'verbose':1,
-			'max_samples':100, # REALLY IMPORTANT PARAMETER
+			'bootstrap':True,
+			'max_samples':200, # REALLY IMPORTANT PARAMETER
+			#'class_weight':'balanced_subsample',
 		}
 		### fit
 		brf = BalancedRandomForestClassifier(**brf_kwargs)
