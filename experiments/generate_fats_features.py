@@ -25,18 +25,10 @@ if __name__== '__main__':
 	import numpy as np
 	from flamingchoripan.files import load_pickle, save_pickle
 	from flamingchoripan.files import get_dict_from_filedir
-	from lchandler import C_
-
-	def load_lcdataset(filename):
-		assert filename.split('.')[-1]==C_.EXT_SPLIT_LIGHTCURVE
-		return load_pickle(filename)
 
 	methods = main_args.method
-	if methods=='.':
-		methods = ['linear-fstw', 'bspline-fstw', 'spm-mle-fstw', 'spm-mcmc-fstw', 'spm-mle-estw', 'spm-mcmc-estw']
-
-	if isinstance(methods, str):
-		methods = [methods]
+	methods = ['linear-fstw', 'bspline-fstw', 'spm-mle-fstw', 'spm-mle-estw', 'spm-mcmc-fstw', 'spm-mcmc-estw'] if methods=='.' else methods
+	methods = [methods] if isinstance(methods, str) else methods
 
 	for method in methods:
 		filedir = f'../../surveys-save/alerceZTFv7.1/survey=alerceZTFv7.1°bands=gr°mode=onlySNe°method={method}.splcds'
@@ -45,9 +37,7 @@ if __name__== '__main__':
 		root_folder = filedict['*rootdir*']
 		cfilename = filedict['*cfilename*']
 		survey = filedict['survey']
-		lcdataset = load_lcdataset(filedir)
-		print(lcdataset['raw'].keys())
-		print(lcdataset['raw'].get_random_lcobj(False).keys())
+		lcdataset = load_pickle(filedir)
 		print(lcdataset)
 
 		###################################################################################################################################################
@@ -57,7 +47,7 @@ if __name__== '__main__':
 		lcset_names = [lcset_name for lcset_name in lcdataset.get_lcset_names() if not 'raw' in lcset_name and len(lcdataset[lcset_name])>0] # ignore all raws because we are not using these
 		for lcset_name in lcset_names:
 			df_x, df_y = get_all_fat_features(lcdataset, lcset_name)
-			save_rootdir = f'../save/{survey}/{cfilename}/features'
+			save_rootdir = f'../save/{survey}/{cfilename}'
 			save_filedir = f'{save_rootdir}/{lcset_name}.ftres'
 			save_features(df_x, df_y, save_filedir)
 
