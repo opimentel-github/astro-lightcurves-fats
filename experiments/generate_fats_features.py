@@ -11,6 +11,7 @@ if __name__== '__main__':
 
 	parser = argparse.ArgumentParser('usage description')
 	parser.add_argument('-method',  type=str, default='.', help='method')
+	#parser.add_argument('-kf',  type=int, default=0, help='kf')
 	main_args = parser.parse_args()
 	print_big_bar()
 

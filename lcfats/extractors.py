@@ -83,7 +83,10 @@ def get_all_fat_features(lcdataset, lcset_name,
 		results = Parallel(n_jobs=n_jobs, backend=backend)([delayed(get_features)(lcset[lcobj_name], band_names) for lcobj_name in chunk]) # None threading 
 		for result, lcobj_name in zip(results, chunk):
 			features_df[lcobj_name] = result
-			labels_df[lcobj_name] = {'__y__':lcset[lcobj_name].y}
+			labels_df[lcobj_name] = {
+				'__y__':lcset[lcobj_name].y,
+				'__fullsynth__':lcset[lcobj_name].all_synthetic(),
+				}
 
 	bar.done()
 	x = pd.DataFrame.from_dict(features_df, orient='index')
