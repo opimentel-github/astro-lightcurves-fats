@@ -11,6 +11,8 @@ from flamingchoripan.progress_bars import ProgressBar
 from flamingchoripan.lists import get_list_chunks
 from joblib import Parallel, delayed
 from .mhps_extractor import MHPSExtractor
+from scipy import stats
+from scipy.optimize import curve_fit
 
 ###################################################################################################################################################
 
@@ -65,6 +67,66 @@ def get_fats_features(lcobjb):
 	)
 	return feature_space.calculate_features(detections)
 
+def get_slopes(days, obs, n, d):
+	slopes = np.diff(obs)/(np.diff(days)+1e-10)
+	slopes = slopes[:n] if d>0 else slopes[-n:]
+	return slopes
+
+def linregress(days, m, n):
+	return days*m+n
+
+def get_custom_features(lcobjb):
+	pre_peak_LinearTrend = np.nan
+	post_peak_LinearTrend = np.nan
+	post_peak_LinearTrend1 = np.nan
+	post_peak_LinearTrend2 = np.nan
+	post_peak_LinearTrend3 = np.nan
+
+	if len(lcobjb.obs)>1:
+		max_index = np.argmax(lcobjb.obs)
+		peak_day = lcobjb.days[max_index]
+
+		post_peak_days = np.linspace(peak_day, lcobjb.days[-1], 3+1)
+
+		try:
+			valid_indexs = np.where(lcobjb.days<=peak_day)[0]
+			pre_peak_LinearTrend = curve_fit(linregress, lcobjb.days[valid_indexs], lcobjb.obs[valid_indexs], sigma=lcobjb.obse[valid_indexs])[0][0]
+		except:
+			pass
+
+		try:
+			valid_indexs = np.where(lcobjb.days>=peak_day)[0]
+			post_peak_LinearTrend = curve_fit(linregress, lcobjb.days[valid_indexs], lcobjb.obs[valid_indexs], sigma=lcobjb.obse[valid_indexs])[0][0]
+		except:
+			pass
+
+		try:
+			valid_indexs = np.where((lcobjb.days>=post_peak_days[0]) & (lcobjb.days<=post_peak_days[1]))[0]
+			post_peak_LinearTrend1 = curve_fit(linregress, lcobjb.days[valid_indexs], lcobjb.obs[valid_indexs], sigma=lcobjb.obse[valid_indexs])[0][0]
+		except:
+			pass
+
+		try:
+			valid_indexs = np.where((lcobjb.days>=post_peak_days[1]) & (lcobjb.days<=post_peak_days[2]))[0]
+			post_peak_LinearTrend2 = curve_fit(linregress, lcobjb.days[valid_indexs], lcobjb.obs[valid_indexs], sigma=lcobjb.obse[valid_indexs])[0][0]
+		except:
+			pass
+
+		try:
+			valid_indexs = np.where((lcobjb.days>=post_peak_days[2]) & (lcobjb.days<=post_peak_days[3]))[0]
+			post_peak_LinearTrend3 = curve_fit(linregress, lcobjb.days[valid_indexs], lcobjb.obs[valid_indexs], sigma=lcobjb.obse[valid_indexs])[0][0]
+		except:
+			pass
+
+	info_dict = {
+		'pre_peak_LinearTrend':pre_peak_LinearTrend,
+		'post_peak_LinearTrend':post_peak_LinearTrend,
+		'post_peak_LinearTrend1':post_peak_LinearTrend1,
+		'post_peak_LinearTrend2':post_peak_LinearTrend2,
+		'post_peak_LinearTrend3':post_peak_LinearTrend3,
+	}
+	return pd.DataFrame.from_dict({'':info_dict}, orient='index')
+
 ###################################################################################################################################################
 
 def get_all_fat_features(lcdataset, lcset_name,
@@ -109,7 +171,14 @@ def get_features(lcobj, band_names):
 
 		### mhps
 		mhps_df_b = get_mhps_features(lcobjb) # ['MHPS_low', 'MHPS_ratio']
+		#print(mhps_df_b)
 		df_to_cat.append(mhps_df_b)
+
+		### custom
+		custom_df_b = get_custom_features(lcobjb)
+		#print(custom_df_b)
+		#assert 0
+		df_to_cat.append(custom_df_b)
 
 		### cat
 		df_bdict[b] = pd.concat(df_to_cat, axis=1, sort=True)

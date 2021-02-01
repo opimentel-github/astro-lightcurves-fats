@@ -14,6 +14,39 @@ def load_features(filedir):
 	y_columns = ['__y__', '__fullsynth__']
 	df_y = df_xy[y_columns]
 	df_x = df_xy[[c for c in columns if not c in y_columns]]
+
+	inv = [
+		#'IAR_phi', # ???
+		#'SF_ML_amplitude', # ?
+		#'LinearTrend',
+
+		#'MHPS_low',
+		'MHPS_non_zero',
+		'MHPS_PN_flag',
+		'MHPS_ratio',
+		'MHPS_high',
+
+		#'SPM_t0', # important
+		'SPM_A', # flux wise
+		'SPM_chi', # conflictive
+
+		'pre_peak_LinearTrend',
+		'post_peak_LinearTrend',
+		'post_peak_LinearTrend1',
+		'post_peak_LinearTrend2',
+		'post_peak_LinearTrend3',
+
+		#'peak_obs_mu',
+		#'peak_obs_std',
+		#'peak_days_mu',
+		#'peak_days_std',
+	]
+	inv2 = []
+	for i in inv:
+		for b in ['g', 'r']:
+			inv2.append(f'{i}_{b}')
+
+	df_x = df_xy[[c for c in df_x.columns if not c in inv2]]
 	#print(df_y)
 	#print(df_x)
 	return df_x, df_y
