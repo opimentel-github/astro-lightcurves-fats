@@ -159,7 +159,8 @@ def get_features(lcobj, band_names):
 	df_bdict = {}
 	for b in band_names:
 		df_to_cat = []
-		lcobjb = lcobj.get_b(b)
+		lcobjb = lcobj.get_b(b).copy()
+		lcobjb.clip_attrs_given_max_day(C_.MAX_DAY)
 		
 		### fats
 		fats_df_b = get_fats_features(lcobjb)
