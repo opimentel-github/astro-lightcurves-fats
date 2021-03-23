@@ -35,7 +35,7 @@ def get_fitted_maps2d(lcdataset, lcset_name, load_rootdir,
 	#map_umap = UMAP(n_components=2, **umap_kwargs)
 	#map_tsne = TSNE(n_components=2, **tsne_kwargs)
 
-	load_filedir = f'{load_rootdir}/features/{lcset_name}.ftres'
+	load_filedir = f'{load_rootdir}/{lcset_name}.ftres'
 	df_x, df_y = load_features(load_filedir)
 	lcobj_names = list(df_x.index)
 	lcobj_names_synth = []
