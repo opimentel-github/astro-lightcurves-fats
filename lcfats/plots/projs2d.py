@@ -5,6 +5,7 @@ from . import C_
 import numpy as np
 import matplotlib.pyplot as plt
 import flamingchoripan.cuteplots.colors as cc
+import flamingchoripan.datascience.statistics as stats
 
 ###################################################################################################################################################
 
@@ -48,9 +49,9 @@ def get_synth_objs(obj_r, objs_s,
 	objs = []
 	counter = 0
 	for k,obj_s in enumerate(objs_s):
-		name_r,_ = obj_r.split('.')
+		name_r = obj_r
 		name_s,id_s = obj_s.split('.')
-		if name_r==name_s and not id_s=='0':
+		if name_r==name_s:
 			objs.append(obj_s)
 			counter += 1
 			if counter>=max_synth_samples:
@@ -106,35 +107,36 @@ def plot_projections_c(ax, maps2d_dict, c,
 	alpha=0.9,
 	max_samples=1e3,
 	):
-	lcobj_names = maps2d_dict['lcobj_names']
+	map_lcobj_names = maps2d_dict['map_lcobj_names']
 	class_names = maps2d_dict['class_names']
 	map_x = maps2d_dict['map_x']
 	labels = maps2d_dict['y']
 	counter = 0
 
 	### plot all
-	for idx,lcobj_name in enumerate(lcobj_names):
+	for idx,lcobj_name in enumerate(map_lcobj_names):
 		if any([not class_names[labels[idx]]==c, counter>max_samples]):
 			continue
 		color = cc.get_default_colorlist()[labels[idx]] if color is None else color
 		map_x_ = map_x[idx]
-		ax.scatter(map_x_[0], map_x_[1], **get_standar_style(color, alpha), label=f'{c} (real & synth)' if counter==0 else None)
+		ax.scatter(map_x_[0], map_x_[1], **get_standar_style(color, alpha), label=f'{c} [real & synth]' if counter==0 else None)
 		counter += 1
 
 def plot_net_projections_c(ax, maps2d_dict, c,
 	alpha=0.9,
-	max_real_samples:int=200,
+	max_real_samples:int=250,
 	max_synth_samples:int=1,
 	):
-	lcobj_names = maps2d_dict['lcobj_names']
+	map_lcobj_names = maps2d_dict['map_lcobj_names']
 	class_names = maps2d_dict['class_names']
 	map_x = maps2d_dict['map_x']
 	labels = maps2d_dict['y']
 	real_counter = 0
+	dist_rank = stats.TopRank()
 
 	### plot all
-	for idx,lcobj_name in enumerate(lcobj_names):
-		is_synthetic = not lcobj_name.split('.')[-1]=='0'
+	for idx,lcobj_name in enumerate(map_lcobj_names):
+		is_synthetic = '.' in lcobj_name
 		if any([not class_names[labels[idx]]==c, real_counter>max_real_samples, is_synthetic]):
 			continue
 
@@ -150,15 +152,22 @@ def plot_net_projections_c(ax, maps2d_dict, c,
 			#label=f'{c}' if not has_label[b][c] else None,
 		}
 		map_x_real = map_x[idx]
-		ax.scatter(map_x_real[0], map_x_real[1], **style, label=f'{c} (real)' if real_counter==0 else None)
+		ax.scatter(map_x_real[0], map_x_real[1], **style, label=f'{c} [real]' if real_counter==0 else None)
 
 		### plot synthetics
-		lcobj_names_synth = get_synth_objs(lcobj_name, maps2d_dict['lcobj_names_synth'], max_synth_samples)
+		lcobj_names_synth = get_synth_objs(lcobj_name, maps2d_dict['s_lcobj_names'], max_synth_samples)
 		for ks,lcobj_name_synth in enumerate(lcobj_names_synth):
-			idx = lcobj_names.index(lcobj_name_synth)
+			idx = map_lcobj_names.index(lcobj_name_synth)
 			map_x_synth = map_x[idx]
-			ax.scatter(map_x_synth[0], map_x_synth[1], **get_standar_style(color, alpha), label=f'{c} (synth)' if real_counter==0 and ks==0 else None)
-			line = ax.plot([map_x_real[0], map_x_synth[0]], [map_x_real[1], map_x_synth[1]], alpha=alpha, lw=0.5, c=color, label=f'{c} real-synth bound' if real_counter==0 and ks==0  else None)
-			#add_arrow(line[0], color=color)
+			ax.scatter(map_x_synth[0], map_x_synth[1], **get_standar_style(color, alpha), label=f'{c} [synth]' if real_counter==0 and ks==0 else None)
+			dist = (map_x_real[0]-map_x_synth[0])**2+(map_x_real[1]-map_x_synth[1])**2
+			line = ax.plot([map_x_real[0], map_x_synth[0]], [map_x_real[1], map_x_synth[1]], alpha=alpha, lw=0.5, c=color, label=f'{c} real-synth' if real_counter==0 and ks==0  else None)
+			dist_rank.add(lcobj_name_synth, dist, [map_x_synth[0], map_x_synth[1]])
 
 		real_counter += 1
+
+	dist_rank.calcule_rank()
+	#print(dist_rank)
+	for k in range(3):
+		name, value, info = dist_rank[k]
+		ax.text(*info, name, horizontalalignment='center', fontsize=14, c=color)
