@@ -4,6 +4,7 @@ from . import C_
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patheffects as PathEffects
 import flamingchoripan.cuteplots.colors as cc
 import flamingchoripan.datascience.statistics as stats
 
@@ -170,4 +171,5 @@ def plot_net_projections_c(ax, maps2d_dict, c,
 	#print(dist_rank)
 	for k in range(3):
 		name, value, info = dist_rank[k]
-		ax.text(*info, name, horizontalalignment='center', fontsize=14, c=color)
+		txt = ax.text(*info, name, horizontalalignment='center', fontsize=13, c=color)
+		txt.set_path_effects([PathEffects.withStroke(linewidth=3, foreground='w')])
