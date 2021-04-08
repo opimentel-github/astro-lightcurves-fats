@@ -130,9 +130,9 @@ def get_custom_features(lcobjb):
 ###################################################################################################################################################
 
 def get_all_fat_features(lcdataset, lcset_name,
+	backend=C_.JOBLIB_BACKEND,
 	n_jobs=C_.N_JOBS,
 	chunk_size=C_.CHUNK_SIZE,
-	backend='threading',
 	):
 	lcset = lcdataset[lcset_name]
 	band_names = lcset.band_names
