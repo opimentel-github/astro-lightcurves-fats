@@ -56,8 +56,8 @@ if __name__== '__main__':
 					continue
 
 			df_x, df_y = get_all_fat_features(lcdataset, lcset_name)
-			save_rootdir = f'../save/{survey}/{cfilename}'
-			save_filedir = f'{save_rootdir}/{lcset_name}.ftres'
+			save_rootdir = f'../save/fats/{cfilename}'
+			save_filedir = f'{save_rootdir}/{lcset_name}.df'
 			save_features(df_x, df_y, save_filedir)
 
 

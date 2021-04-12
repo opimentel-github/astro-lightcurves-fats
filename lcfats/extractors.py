@@ -129,40 +129,6 @@ def get_custom_features(lcobjb):
 
 ###################################################################################################################################################
 
-def get_all_fat_features(lcdataset, lcset_name,
-	backend=C_.JOBLIB_BACKEND,
-	n_jobs=C_.N_JOBS,
-	chunk_size=C_.CHUNK_SIZE,
-	):
-	lcset = lcdataset[lcset_name]
-	band_names = lcset.band_names
-	features_df = {}
-	labels_df = {}
-	chunks = get_list_chunks(lcset.get_lcobj_names(), chunk_size)
-	bar = ProgressBar(len(chunks))
-	for kc,chunk in enumerate(chunks):
-		bar(f'lcset_name={lcset_name} - chunk_size={chunk_size} - chunck={chunck}')
-		jobs = []
-		for lcobj_name in chunk:
-			jobs.append(delayed(get_features)(
-				lcobj_name,
-				lcset[lcobj_name],
-				lcset_name,
-				lcset.get_info(),
-			))
-		results = Parallel(n_jobs=n_jobs, backend=backend)(jobs)
-		for result, lcobj_name in zip(results, chunk):
-			features_df[lcobj_name] = result
-			labels_df[lcobj_name] = {
-				'__y':lcset[lcobj_name].y,
-				'__fullsynth':lcset[lcobj_name].all_synthetic(),
-				}
-
-	bar.done()
-	x = pd.DataFrame.from_dict(features_df, orient='index')
-	y = pd.DataFrame.from_dict(labels_df, orient='index')
-	return x, y
-
 def get_features(lcobj_name, lcobj, lcset_name, lcset_info):
 	band_names = lcset_info['band_names']
 	df_bdict = {}
@@ -200,3 +166,37 @@ def get_features(lcobj_name, lcobj, lcset_name, lcset_info):
 	features_df = pd.concat([df_bdict[b] for b in band_names], axis=1, sort=True)
 	features_df = features_df.clip(-abs(C_.NAN_VALUE), abs(C_.NAN_VALUE)).fillna(C_.NAN_VALUE)
 	return features_df.to_dict(orient='index')['']
+
+def get_all_fat_features(lcdataset, lcset_name,
+	backend=C_.JOBLIB_BACKEND,
+	n_jobs=C_.N_JOBS,
+	chunk_size=C_.CHUNK_SIZE,
+	):
+	lcset = lcdataset[lcset_name]
+	band_names = lcset.band_names
+	features_df = {}
+	labels_df = {}
+	chunks = get_list_chunks(lcset.get_lcobj_names(), chunk_size)
+	bar = ProgressBar(len(chunks))
+	for kc,chunk in enumerate(chunks):
+		bar(f'lcset_name={lcset_name} - chunk_size={chunk_size} - chunk={chunk}')
+		jobs = []
+		for lcobj_name in chunk:
+			jobs.append(delayed(get_features)(
+				lcobj_name,
+				lcset[lcobj_name],
+				lcset_name,
+				lcset.get_info(),
+			))
+		results = Parallel(n_jobs=n_jobs, backend=backend)(jobs)
+		for result, lcobj_name in zip(results, chunk):
+			features_df[lcobj_name] = result
+			labels_df[lcobj_name] = {
+				'__y':lcset[lcobj_name].y,
+				'__fullsynth':lcset[lcobj_name].all_synthetic(),
+				}
+
+	bar.done()
+	x = pd.DataFrame.from_dict(features_df, orient='index')
+	y = pd.DataFrame.from_dict(labels_df, orient='index')
+	return x, y
