@@ -35,8 +35,8 @@ if __name__== '__main__':
 	for method in methods:
 		filedir = f'../../surveys-save/alerceZTFv7.1/survey=alerceZTFv7.1°bands=gr°mode=onlySNe°method={method}.splcds'
 		filedict = get_dict_from_filedir(filedir)
-		root_folder = filedict['*rootdir*']
-		cfilename = filedict['*cfilename*']
+		root_folder = filedict['__rootdir']
+		cfilename = filedict['__cfilename']
 		survey = filedict['survey']
 		lcdataset = load_pickle(filedir)
 		print(lcdataset)

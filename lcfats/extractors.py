@@ -141,13 +141,21 @@ def get_all_fat_features(lcdataset, lcset_name,
 	chunks = get_list_chunks(lcset.get_lcobj_names(), chunk_size)
 	bar = ProgressBar(len(chunks))
 	for kc,chunk in enumerate(chunks):
-		bar(f'lcset_name: {lcset_name} - chunck: {kc} - chunk_size: {chunk_size}')
-		results = Parallel(n_jobs=n_jobs, backend=backend)([delayed(get_features)(lcset[lcobj_name], band_names) for lcobj_name in chunk]) # None threading 
+		bar(f'lcset_name={lcset_name} - chunk_size={chunk_size} - chunck={chunck}')
+		jobs = []
+		for lcobj_name in chunk:
+			jobs.append(delayed(get_features)(
+				lcobj_name,
+				lcset[lcobj_name],
+				lcset_name,
+				lcset.get_info(),
+			))
+		results = Parallel(n_jobs=n_jobs, backend=backend)(jobs)
 		for result, lcobj_name in zip(results, chunk):
 			features_df[lcobj_name] = result
 			labels_df[lcobj_name] = {
-				'__y__':lcset[lcobj_name].y,
-				'__fullsynth__':lcset[lcobj_name].all_synthetic(),
+				'__y':lcset[lcobj_name].y,
+				'__fullsynth':lcset[lcobj_name].all_synthetic(),
 				}
 
 	bar.done()
@@ -155,7 +163,8 @@ def get_all_fat_features(lcdataset, lcset_name,
 	y = pd.DataFrame.from_dict(labels_df, orient='index')
 	return x, y
 
-def get_features(lcobj, band_names):
+def get_features(lcobj_name, lcobj, lcset_name, lcset_info):
+	band_names = lcset_info['band_names']
 	df_bdict = {}
 	for b in band_names:
 		df_to_cat = []
