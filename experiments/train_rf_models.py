@@ -18,11 +18,16 @@ if __name__== '__main__':
 	print_big_bar()
 
 	###################################################################################################################################################
-	from flamingchoripan.files import search_for_filedirs
-	from lchandler import C_
+	import numpy as np
+	from flamingchoripan.files import load_pickle, save_pickle, get_dict_from_filedir
 
-	rootdir = '../../surveys-save'
-	filedirs = search_for_filedirs(rootdir, fext=C_.EXT_SPLIT_LIGHTCURVE)
+	filedir = f'../../surveys-save/survey=alerceZTFv7.1~bands=gr~mode=onlySNe.splcds'
+	filedict = get_dict_from_filedir(filedir)
+	rootdir = filedict['_rootdir']
+	cfilename = filedict['_cfilename']
+	survey = filedict['survey']
+	lcdataset = load_pickle(filedir)
+	print(lcdataset)
 
 	###################################################################################################################################################
 	import numpy as np
@@ -33,7 +38,7 @@ if __name__== '__main__':
 	from lcfats.classifiers import train_classifier, evaluate_classifier
 	import pandas as pd
 
-	kfs = [str(kf) for kf in range(0,3)] if main_args.kf=='.' else main_args.kf
+	kfs = lcdataset.kfolds if main_args.kf=='.' else main_args.kf
 	kfs = [kfs] if isinstance(kfs, str) else kfs
 	methods = ['linear-fstw', 'bspline-fstw', 'spm-mle-fstw', 'spm-mle-estw', 'spm-mcmc-fstw', 'spm-mcmc-estw'] if main_args.method=='.' else main_args.method
 	methods = [methods] if isinstance(methods, str) else methods
