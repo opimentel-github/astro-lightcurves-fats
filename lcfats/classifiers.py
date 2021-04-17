@@ -5,7 +5,7 @@ from . import C_
 import pandas as pd
 from imblearn.ensemble import BalancedRandomForestClassifier
 from sklearn.ensemble import RandomForestClassifier
-from flamingchoripan.datascience.statistics import TopRank
+from flamingchoripan.datascience.ranks import TopRank
 from flamingchoripan.datascience.metrics import get_multiclass_metrics
 import numpy as np
 import random
@@ -47,7 +47,7 @@ def evaluate_classifier(brf, eval_df_x, eval_df_y, lcset_info,
 	features = list(eval_df_x.columns)
 	rank = TopRank('features')
 	rank.add_list(features, brf.feature_importances_)
-	rank.calcule_rank()
+	rank.calcule()
 	results = {
 		'lcset_info':lcset_info,
 		'metrics_cdict':metrics_cdict,

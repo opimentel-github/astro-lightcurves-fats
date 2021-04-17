@@ -192,8 +192,8 @@ def get_all_fat_features(lcdataset, lcset_name,
 		for result, lcobj_name in zip(results, chunk):
 			features_df[lcobj_name] = result
 			labels_df[lcobj_name] = {
-				'__y':lcset[lcobj_name].y,
-				'__fullsynth':lcset[lcobj_name].all_synthetic(),
+				'_y':lcset[lcobj_name].y,
+				'_fullsynth':lcset[lcobj_name].all_synthetic(),
 				}
 
 	bar.done()

@@ -40,10 +40,10 @@ if __name__== '__main__':
 
 	for kf in kfs:
 		for method in methods:
-			filedir = f'../../surveys-save/survey=alerceZTFv7.1°bands=gr°mode=onlySNe°method={method}.splcds'
+			filedir = f'../../surveys-save/survey=alerceZTFv7.1~bands=gr~mode=onlySNe~method={method}.splcds'
 			filedict = get_dict_from_filedir(filedir)
-			rootdir = filedict['__rootdir']
-			cfilename = filedict['__cfilename']
+			rootdir = filedict['_rootdir']
+			cfilename = filedict['_cfilename']
 			lcdataset = load_pickle(filedir)
 			lcset_info = lcdataset['raw'].get_info()
 			print(lcdataset)
@@ -76,10 +76,10 @@ if __name__== '__main__':
 					brf = train_classifier(train_df_x, train_df_y, **fit_kwargs)
 
 					results_val = evaluate_classifier(brf, val_df_x, val_df_y, lcset_info, **fit_kwargs)
-					save_pickle(f'../save/exp=rf_eval°train_config={train_config}/{cfilename}/{kf}@val/id={model_id}.df', results_val)
+					save_pickle(f'../save/exp=rf_eval~train_config={train_config}/{cfilename}/{kf}@val/id={model_id}.df', results_val)
 
 					results_test = evaluate_classifier(brf, test_df_x, test_df_y, lcset_info, **fit_kwargs)
-					save_pickle(f'../save/exp=rf_eval°train_config={train_config}/{cfilename}/{kf}@test/id={model_id}.df', results_test)
+					save_pickle(f'../save/exp=rf_eval~train_config={train_config}/{cfilename}/{kf}@test/id={model_id}.df', results_test)
 
 				bar.done()
 
