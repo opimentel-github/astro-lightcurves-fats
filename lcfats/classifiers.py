@@ -30,14 +30,14 @@ def train_classifier(train_df_x, train_df_y,
 		#'class_weight':'balanced_subsample',
 	}
 	brf = BalancedRandomForestClassifier(**brf_kwargs)
-	brf.fit(train_df_x.values, train_df_y[['__y']].values[...,0])
+	brf.fit(train_df_x.values, train_df_y[['_y']].values[...,0])
 	return brf
 
 
 def evaluate_classifier(brf, eval_df_x, eval_df_y, lcset_info,
 	):
 	class_names = lcset_info['class_names']
-	y_target = eval_df_y[['__y']].values[...,0]
+	y_target = eval_df_y[['_y']].values[...,0]
 	y_pred_p = brf.predict_proba(eval_df_x.values)
 	y_pred = np.argmax(y_pred_p, axis=-1)
 
