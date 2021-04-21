@@ -12,7 +12,7 @@ if __name__== '__main__':
 
 	parser = argparse.ArgumentParser('usage description')
 	parser.add_argument('-method',  type=str, default='.', help='method')
-	parser.add_argument('-mids',  type=str, default='0-50', help='initial_id-final_id')
+	parser.add_argument('-mids',  type=str, default='0-25', help='initial_id-final_id')
 	parser.add_argument('-kf',  type=str, default='.', help='kf')
 	main_args = parser.parse_args()
 	print_big_bar()
@@ -40,7 +40,8 @@ if __name__== '__main__':
 
 	kfs = lcdataset.kfolds if main_args.kf=='.' else main_args.kf
 	kfs = [kfs] if isinstance(kfs, str) else kfs
-	methods = ['linear-fstw', 'bspline-fstw', 'spm-mle-fstw', 'spm-mle-estw', 'spm-mcmc-fstw', 'spm-mcmc-estw'] if main_args.method=='.' else main_args.method
+	#methods = ['linear-fstw', 'bspline-fstw', 'spm-mle-fstw', 'spm-mle-estw', 'spm-mcmc-fstw', 'spm-mcmc-estw'] if main_args.method=='.' else main_args.method
+	methods = ['linear-fstw', 'bspline-fstw', 'spm-mcmc-fstw', 'spm-mcmc-estw'] if main_args.method=='.' else main_args.method
 	methods = [methods] if isinstance(methods, str) else methods
 
 	for kf in kfs:

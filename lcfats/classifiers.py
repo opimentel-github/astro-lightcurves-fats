@@ -16,7 +16,7 @@ def train_classifier(train_df_x, train_df_y,
 	):
 	brf_kwargs = {
 		'n_jobs':C_.N_JOBS,
-		'n_estimators':1000, # 1000
+		'n_estimators':1500, # 1000
 		#'max_depth':10, # #
 		'max_features':None,
 		#'max_features':'auto',
