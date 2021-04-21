@@ -37,10 +37,10 @@ def get_fitted_maps2d(lcdataset, s_lcset_name, load_rootdir,
 	#map_umap = UMAP(n_components=2, **umap_kwargs)
 	#map_tsne = TSNE(n_components=2, **tsne_kwargs)
 
-	r_df_x, r_df_y = load_features(f'{load_rootdir}/{r_lcset_name}.ftres')
+	r_df_x, r_df_y = load_features(f'{load_rootdir}/{r_lcset_name}.df')
 	r_lcobj_names = list(r_df_x.index)
 
-	s_df_x, s_df_y = load_features(f'{load_rootdir}/{s_lcset_name}.ftres')
+	s_df_x, s_df_y = load_features(f'{load_rootdir}/{s_lcset_name}.df')
 	s_lcobj_names = list(s_df_x.index)
 
 	map_lcobj_names = r_lcobj_names+s_lcobj_names

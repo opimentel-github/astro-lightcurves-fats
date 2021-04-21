@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as PathEffects
 import flamingchoripan.cuteplots.colors as cc
-import flamingchoripan.datascience.statistics as stats
+from flamingchoripan.datascience.ranks import TopRank
 
 ###################################################################################################################################################
 
@@ -133,7 +133,7 @@ def plot_net_projections_c(ax, maps2d_dict, c,
 	map_x = maps2d_dict['map_x']
 	labels = maps2d_dict['y']
 	real_counter = 0
-	dist_rank = stats.TopRank()
+	dist_rank = TopRank()
 
 	### plot all
 	for idx,lcobj_name in enumerate(map_lcobj_names):
@@ -163,11 +163,11 @@ def plot_net_projections_c(ax, maps2d_dict, c,
 			ax.scatter(map_x_synth[0], map_x_synth[1], **get_standar_style(color, alpha), label=f'{c} [synth]' if real_counter==0 and ks==0 else None)
 			dist = (map_x_real[0]-map_x_synth[0])**2+(map_x_real[1]-map_x_synth[1])**2
 			line = ax.plot([map_x_real[0], map_x_synth[0]], [map_x_real[1], map_x_synth[1]], alpha=alpha, lw=0.5, c=color, label=f'{c} real-synth' if real_counter==0 and ks==0  else None)
-			dist_rank.add(lcobj_name_synth, dist, [map_x_synth[0], map_x_synth[1]])
+			dist_rank.append(lcobj_name_synth, dist, [map_x_synth[0], map_x_synth[1]])
 
 		real_counter += 1
 
-	dist_rank.calcule_rank()
+	dist_rank.calcule()
 	#print(dist_rank)
 	for k in range(3):
 		name, value, info = dist_rank[k]
