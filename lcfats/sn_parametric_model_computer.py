@@ -65,7 +65,7 @@ class SNModelScipy(object):
                         [A_bounds[1], t0_bounds[1], gamma_bounds[1], f_bounds[1], trise_bounds[1], tfall_bounds[1]]],
                 #ftol=A_guess / 20.,
                 ftol=0.01,
-                #sigma=obs_errors+0.01,# why missing?
+                sigma=obs_errors**2+.1,# why missing?
                 )
         except (ValueError, RuntimeError, OptimizeWarning):
             try:
@@ -79,7 +79,7 @@ class SNModelScipy(object):
                              tfall_bounds[1]]],
                     #ftol=A_guess / 3.,
                     ftol=0.01,
-                    #sigma=obs_errors+0.01,# why missing?
+                    sigma=obs_errors**2+.1,# why missing?
                     )
             except (ValueError, RuntimeError, OptimizeWarning):
                 pout = [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan]

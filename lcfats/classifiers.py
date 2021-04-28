@@ -16,12 +16,12 @@ def train_classifier(train_df_x, train_df_y,
 	):
 	brf_kwargs = {
 		'n_jobs':C_.N_JOBS,
-		'n_estimators':1500, # 1000
+		'n_estimators':2000, # 1000
 		#'max_depth':10, # #
 		'max_features':None,
 		#'max_features':'auto',
 		#'class_weight':None,
-		'criterion':'entropy',
+		'criterion':'entropy', # entropy gini
 		#'min_samples_split':2,
 		#'min_samples_leaf':1,
 		#'verbose':1,
@@ -41,6 +41,10 @@ def evaluate_classifier(brf, eval_df_x, eval_df_y, lcset_info,
 	y_pred_p = brf.predict_proba(eval_df_x.values)
 	y_pred = np.argmax(y_pred_p, axis=-1)
 
+	wrongs_indexs = ~(y_target==y_pred)
+	wrongs_df = eval_df_y[wrongs_indexs]
+	#print(wrongs_df)
+	#assert 0
 	metrics_cdict, metrics_dict, cm = get_multiclass_metrics(y_pred, y_target, class_names, pred_is_onehot=False, y_pred_p=y_pred_p)
 
 	### results
@@ -49,6 +53,7 @@ def evaluate_classifier(brf, eval_df_x, eval_df_y, lcset_info,
 	rank.add_list(features, brf.feature_importances_)
 	rank.calcule()
 	results = {
+		'wrongs_df':wrongs_df,
 		'lcset_info':lcset_info,
 		'metrics_cdict':metrics_cdict,
 		'metrics_dict':metrics_dict,

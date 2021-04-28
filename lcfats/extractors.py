@@ -56,8 +56,8 @@ def get_mhps_features(lcobjb,
 
 def get_fats_features(lcobjb):
 	#if len(lcobjb)==0
-	#feature_names = C_.OLD_FEATURES+C_.ALERCE_FEATURES
-	feature_names = C_.ALERCE_SPM_FEATURES
+	feature_names = list(zip(C_.ALERCE_SPM_FEATURES+C_.OLD_FEATURES+C_.ALERCE_FEATURES))
+	#feature_names = 
 	feature_space = turbofats.FeatureSpace(feature_names)
 	detections_data = np.concatenate([lcobjb.days[...,None], lcobjb.obs[...,None], lcobjb.obse[...,None]], axis=-1)
 	detections = pd.DataFrame(
@@ -135,7 +135,8 @@ def get_features(lcobj_name, lcobj, lcset_name, lcset_info):
 	for b in band_names:
 		df_to_cat = []
 		lcobjb = lcobj.get_b(b).copy()
-		lcobjb.clip_attrs_given_max_day(C_.MAX_DAY)
+		lcobjb.clip_attrs_given_max_day(C_.MAX_DAY) # clip by max day
+		print('days', lcobj.get_b(b).days(), lcobjb.days)
 		
 		### fats
 		fats_df_b = get_fats_features(lcobjb)
@@ -147,14 +148,13 @@ def get_features(lcobj_name, lcobj, lcset_name, lcset_info):
 
 		### mhps
 		mhps_df_b = get_mhps_features(lcobjb) # ['MHPS_low', 'MHPS_ratio']
-		#print(mhps_df_b)
 		df_to_cat.append(mhps_df_b)
 
 		### custom
-		custom_df_b = get_custom_features(lcobjb)
+		#custom_df_b = get_custom_features(lcobjb)
 		#print(custom_df_b)
 		#assert 0
-		df_to_cat.append(custom_df_b)
+		#df_to_cat.append(custom_df_b)
 
 		### cat
 		df_bdict[b] = pd.concat(df_to_cat, axis=1, sort=True)

@@ -12,7 +12,7 @@ if __name__== '__main__':
 
 	parser = argparse.ArgumentParser('usage description')
 	parser.add_argument('-method',  type=str, default='.', help='method')
-	parser.add_argument('-mids',  type=str, default='0-25', help='initial_id-final_id')
+	parser.add_argument('-mids',  type=str, default='0-10', help='initial_id-final_id')
 	parser.add_argument('-kf',  type=str, default='.', help='kf')
 	main_args = parser.parse_args()
 	print_big_bar()
@@ -54,7 +54,8 @@ if __name__== '__main__':
 			lcset_info = lcdataset['raw'].get_info()
 			print(lcdataset)
 
-			for train_config in ['r', 's', 'r+s']:
+			#for train_config in ['r', 's', 'r+s']:
+			for train_config in ['r', 's']:
 				###################################################################################################################################################
 				### IDS
 				model_ids = list(range(*[int(mi) for mi in main_args.mids.split('-')]))
