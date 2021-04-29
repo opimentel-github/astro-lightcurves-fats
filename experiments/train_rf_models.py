@@ -54,8 +54,8 @@ if __name__== '__main__':
 			lcset_info = lcdataset['raw'].get_info()
 			print(lcdataset)
 
-			#for train_config in ['r', 's', 'r+s']:
-			for train_config in ['r', 's']:
+			for train_config in ['r', 's', 'r+s']:
+			#for train_config in ['r', 's']:
 				###################################################################################################################################################
 				### IDS
 				model_ids = list(range(*[int(mi) for mi in main_args.mids.split('-')]))
@@ -77,7 +77,6 @@ if __name__== '__main__':
 					val_df_x, val_df_y = load_features(f'../save/fats/{cfilename}/{kf}@val.df')
 					test_df_x, test_df_y = load_features(f'../save/fats/{cfilename}/{kf}@test.df')
 
-					bar(f'kf={kf} - method={method} - train_config={train_config} - model_id={model_id} - samples={len(train_df_y)} - features={len(train_df_x.columns)}')
 					#print(list(train_df_x.columns))
 					fit_kwargs = {}
 					brf = train_classifier(train_df_x, train_df_y, **fit_kwargs)
@@ -87,6 +86,9 @@ if __name__== '__main__':
 
 					results_test = evaluate_classifier(brf, test_df_x, test_df_y, lcset_info, **fit_kwargs)
 					save_pickle(f'../save/exp=rf_eval~train_config={train_config}/{cfilename}/{kf}@test/id={model_id}.df', results_test)
+
+					accu = results_test['metrics_dict']['b-accuracy']
+					bar(f'kf={kf} - method={method} - train_config={train_config} - model_id={model_id} -accu={accu} - samples={len(train_df_y)} - features={len(train_df_x.columns)}')
 
 				bar.done()
 

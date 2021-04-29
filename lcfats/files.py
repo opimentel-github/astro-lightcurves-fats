@@ -8,6 +8,13 @@ import os
 
 ###################################################################################################################################################
 
+def get_multiband_invalid_features(invalid_features):
+	x = []
+	for i in invalid_features:
+		for b in ['g', 'r']:
+			x.append(f'{i}_{b}')
+	return x
+
 def load_features(filedir):
 	df_xy = pd.read_parquet(os.path.abspath(f'{filedir}')) # parquet
 	columns = list(df_xy.columns)
@@ -15,41 +22,37 @@ def load_features(filedir):
 	df_y = df_xy[y_columns]
 	df_x = df_xy[[c for c in columns if not c in y_columns]]
 
-	if 1:
-		inv = [
-			#'IAR_phi', # ???
-			#'SF_ML_amplitude', # ?
-			#'LinearTrend',
+	invalid_features = [
+		#'Amplitude',
 
-			#'MHPS_low',
-			#'MHPS_non_zero',
-			#'MHPS_PN_flag',
-			#'MHPS_ratio',
-			#'MHPS_high',
+		#'IAR_phi', # ???
+		#'SF_ML_amplitude',
+		#'LinearTrend',
 
-			'SPM_t0', # important
-			#'SPM_A', # flux wise
-			'SPM_chi', # conflictive
+		#'MHPS_low',
+		#'MHPS_non_zero',
+		#'MHPS_PN_flag',
+		#'MHPS_ratio',
+		#'MHPS_high',
 
-			#'pre_peak_LinearTrend',
-			#'post_peak_LinearTrend',
-			#'post_peak_LinearTrend1',
-			#'post_peak_LinearTrend2',
-			#'post_peak_LinearTrend3',
+		#'SPM_t0', # important
+		#'SPM_A', # flux wise
+		#'SPM_chi', # conflictive
 
-			#'peak_obs_mu',
-			#'peak_obs_std',
-			#'peak_days_mu',
-			#'peak_days_std',
-		]
-		inv2 = []
-		for i in inv:
-			for b in ['g', 'r']:
-				inv2.append(f'{i}_{b}')
+		#'pre_peak_LinearTrend',
+		#'post_peak_LinearTrend',
+		#'post_peak_LinearTrend1',
+		#'post_peak_LinearTrend2',
+		#'post_peak_LinearTrend3',
 
-		df_x = df_xy[[c for c in df_x.columns if not c in inv2]]
-		#print(df_y)
-		#print(df_x)
+		#'peak_obs_mu',
+		#'peak_obs_std',
+		#'peak_days_mu',
+		#'peak_days_std',
+	]#+C_.ALERCE_FEATURES
+
+	if len(invalid_features)>0:
+		df_x = df_xy[[c for c in df_x.columns if not c in get_multiband_invalid_features(invalid_features)]]
 	return df_x, df_y
 
 def save_features(df_x, df_y, save_filedir):

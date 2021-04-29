@@ -56,8 +56,7 @@ def get_mhps_features(lcobjb,
 
 def get_fats_features(lcobjb):
 	#if len(lcobjb)==0
-	feature_names = list(zip(C_.ALERCE_SPM_FEATURES+C_.OLD_FEATURES+C_.ALERCE_FEATURES))
-	#feature_names = 
+	feature_names = list(set(C_.ALERCE_SPM_FEATURES+C_.OLD_FEATURES+C_.ALERCE_FEATURES))
 	feature_space = turbofats.FeatureSpace(feature_names)
 	detections_data = np.concatenate([lcobjb.days[...,None], lcobjb.obs[...,None], lcobjb.obse[...,None]], axis=-1)
 	detections = pd.DataFrame(
@@ -136,7 +135,8 @@ def get_features(lcobj_name, lcobj, lcset_name, lcset_info):
 		df_to_cat = []
 		lcobjb = lcobj.get_b(b).copy()
 		lcobjb.clip_attrs_given_max_day(C_.MAX_DAY) # clip by max day
-		print('days', lcobj.get_b(b).days(), lcobjb.days)
+		#print('days pre', lcobj.get_b(b).days)
+		#print('days post clip', lcobjb.days)
 		
 		### fats
 		fats_df_b = get_fats_features(lcobjb)

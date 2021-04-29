@@ -17,22 +17,19 @@ def train_classifier(train_df_x, train_df_y,
 	brf_kwargs = {
 		'n_jobs':C_.N_JOBS,
 		'n_estimators':2000, # 1000
-		#'max_depth':10, # #
+		#'max_depth':10, #
 		'max_features':None,
 		#'max_features':'auto',
-		#'class_weight':None,
 		'criterion':'entropy', # entropy gini
 		#'min_samples_split':2,
 		#'min_samples_leaf':1,
 		#'verbose':1,
 		'bootstrap':True,
 		'max_samples':500, # REALLY IMPORTANT PARAMETER
-		#'class_weight':'balanced_subsample',
 	}
 	brf = BalancedRandomForestClassifier(**brf_kwargs)
 	brf.fit(train_df_x.values, train_df_y[['_y']].values[...,0])
 	return brf
-
 
 def evaluate_classifier(brf, eval_df_x, eval_df_y, lcset_info,
 	):
@@ -43,8 +40,6 @@ def evaluate_classifier(brf, eval_df_x, eval_df_y, lcset_info,
 
 	wrongs_indexs = ~(y_target==y_pred)
 	wrongs_df = eval_df_y[wrongs_indexs]
-	#print(wrongs_df)
-	#assert 0
 	metrics_cdict, metrics_dict, cm = get_multiclass_metrics(y_pred, y_target, class_names, pred_is_onehot=False, y_pred_p=y_pred_p)
 
 	### results
