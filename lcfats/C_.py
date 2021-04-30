@@ -15,12 +15,22 @@ N_JOBS = -1 # The number of jobs to use for the computation. If -1 all CPUs are 
 CHUNK_SIZE = os.cpu_count() if N_JOBS<0 else N_JOBS
 
 ALERCE_SPM_FEATURES = [
+	'SPM_t0',
+	'SPM_A',
+	'SPM_chi',
+	'SPM_gamma',
+	'SPM_tau_rise',
+	'SPM_tau_fall',
+	'SPM_beta_r',
+]
+
+ALERCE_SNE_FEATURES = [
 	'SF_ML_amplitude',
 	'IAR_phi',
 	'LinearTrend',
 	#'GP_DRW_sigma', # slow?
 	#'GP_DRW_tau', # slow?
-]
+]+ALERCE_SPM_FEATURES
 
 OLD_FEATURES = [
 	#'MeanvariancePairSlopeTrend',

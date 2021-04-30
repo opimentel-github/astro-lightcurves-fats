@@ -88,7 +88,8 @@ if __name__== '__main__':
 					save_pickle(f'../save/exp=rf_eval~train_config={train_config}/{cfilename}/{kf}@test/id={model_id}.df', results_test)
 
 					accu = results_test['metrics_dict']['b-accuracy']
-					bar(f'kf={kf} - method={method} - train_config={train_config} - model_id={model_id} -accu={accu} - samples={len(train_df_y)} - features={len(train_df_x.columns)}')
+					features = list(train_df_x.columns)
+					bar(f'kf={kf} - method={method} - train_config={train_config} - model_id={model_id} -accu={accu} - samples={len(train_df_y)} - features={features}({len(features)}#)')
 
 				bar.done()
 

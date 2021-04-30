@@ -8,7 +8,7 @@ import os
 
 ###################################################################################################################################################
 
-def get_multiband_invalid_features(invalid_features):
+def get_multiband_features(invalid_features):
 	x = []
 	for i in invalid_features:
 		for b in ['g', 'r']:
@@ -50,9 +50,10 @@ def load_features(filedir):
 		#'peak_days_mu',
 		#'peak_days_std',
 	]#+C_.ALERCE_FEATURES
-
-	if len(invalid_features)>0:
-		df_x = df_xy[[c for c in df_x.columns if not c in get_multiband_invalid_features(invalid_features)]]
+	query_features = get_multiband_features(C_.ALERCE_SPM_FEATURES)
+	invalid_features = get_multiband_features(invalid_features)
+	df_x = df_xy[[c for c in df_x.columns if c in query_features and not c in invalid_features]]
+	#features_df = features_df.clip(-abs(C_.NAN_VALUE), abs(C_.NAN_VALUE)).fillna(C_.NAN_VALUE) # REPLACE NANS
 	return df_x, df_y
 
 def save_features(df_x, df_y, save_filedir):
