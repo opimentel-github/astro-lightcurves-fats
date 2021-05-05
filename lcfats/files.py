@@ -52,8 +52,7 @@ def load_features(filedir):
 	]#+C_.ALERCE_FEATURES
 	query_features = get_multiband_features(C_.ALERCE_SPM_FEATURES)
 	invalid_features = get_multiband_features(invalid_features)
-	df_x = df_xy[[c for c in df_x.columns if c in query_features and not c in invalid_features]]
-	#features_df = features_df.clip(-abs(C_.NAN_VALUE), abs(C_.NAN_VALUE)).fillna(C_.NAN_VALUE) # REPLACE NANS
+	#df_x = df_xy[[c for c in df_x.columns if c in query_features and not c in invalid_features]]
 	return df_x, df_y
 
 def save_features(df_x, df_y, save_filedir):

@@ -12,7 +12,17 @@ import random
 
 ###################################################################################################################################################
 
+def clean_df_nans(df, df_values, nan_value,
+	nan_mode='value', # value, mean
+	):
+	if nan_mode=='value':
+		df = df.replace([np.inf, -np.inf], np.nan)
+		return df.fillna(nan_value)
+	elif nan_mode=='mean':
+		return df.fillna(df_values)
+
 def train_classifier(train_df_x, train_df_y,
+	nan_mode='value', # value, mean
 	):
 	brf_kwargs = {
 		'n_jobs':C_.N_JOBS,
@@ -27,9 +37,21 @@ def train_classifier(train_df_x, train_df_y,
 		'bootstrap':True,
 		'max_samples':500, # REALLY IMPORTANT PARAMETER
 	}
+
 	brf = BalancedRandomForestClassifier(**brf_kwargs)
+	mean_train_df_x = train_df_x.mean(axis='index', skipna=True)
+	#with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+	#	print('mean_train_df_x',mean_train_df_x)
+	null_cols = train_df_x.columns[train_df_x.isnull().all()]
+	print('null_cols',null_cols)
+	train_df_x = clean_df_nans(train_df_x, mean_train_df_x, C_.NAN_VALUE, nan_mode)
 	brf.fit(train_df_x.values, train_df_y[['_y']].values[...,0])
-	return brf
+	d = {
+		'brf':brf,
+		'mean_train_df_x':mean_train_df_x,
+		'null_cols':null_cols,
+		}
+	return d
 
 def evaluate_classifier(brf, eval_df_x, eval_df_y, lcset_info,
 	):
@@ -47,7 +69,7 @@ def evaluate_classifier(brf, eval_df_x, eval_df_y, lcset_info,
 	rank = TopRank('features')
 	rank.add_list(features, brf.feature_importances_)
 	rank.calcule()
-	results = {
+	d = {
 		'wrongs_df':wrongs_df,
 		'lcset_info':lcset_info,
 		'metrics_cdict':metrics_cdict,
@@ -55,5 +77,5 @@ def evaluate_classifier(brf, eval_df_x, eval_df_y, lcset_info,
 		'cm':cm,
 		'features':features,
 		'rank':rank,
-	}
-	return results
+		}
+	return d

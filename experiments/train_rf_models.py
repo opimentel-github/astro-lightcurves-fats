@@ -79,16 +79,16 @@ if __name__== '__main__':
 
 					#print(list(train_df_x.columns))
 					fit_kwargs = {}
-					brf = train_classifier(train_df_x, train_df_y, **fit_kwargs)
+					features = list(train_df_x.columns)
+					brf_d = train_classifier(train_df_x, train_df_y, **fit_kwargs)
 
-					results_val = evaluate_classifier(brf, val_df_x, val_df_y, lcset_info, **fit_kwargs)
-					save_pickle(f'../save/exp=rf_eval~train_config={train_config}/{cfilename}/{kf}@val/id={model_id}.df', results_val)
+					results_val = evaluate_classifier(brf_d, val_df_x, val_df_y, lcset_info, **fit_kwargs)
+					save_pickle(f'../save/exp=rf_eval~train_config={train_config}~in-dims={len(features)}/{cfilename}/{kf}@val/id={model_id}.df', results_val)
 
-					results_test = evaluate_classifier(brf, test_df_x, test_df_y, lcset_info, **fit_kwargs)
-					save_pickle(f'../save/exp=rf_eval~train_config={train_config}/{cfilename}/{kf}@test/id={model_id}.df', results_test)
+					results_test = evaluate_classifier(brf_d, test_df_x, test_df_y, lcset_info, **fit_kwargs)
+					save_pickle(f'../save/exp=rf_eval~train_config={train_config}~in-dims={len(features)}/{cfilename}/{kf}@test/id={model_id}.df', results_test)
 
 					accu = results_test['metrics_dict']['b-accuracy']
-					features = list(train_df_x.columns)
 					bar(f'kf={kf} - method={method} - train_config={train_config} - model_id={model_id} -accu={accu} - samples={len(train_df_y)} - features={features}({len(features)}#)')
 
 				bar.done()

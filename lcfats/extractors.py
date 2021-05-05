@@ -32,8 +32,7 @@ def get_spm_features(lcobjb,
 	except:
 		features_df = get_null_df(spm_names)
 
-	if not feature_names is None:
-		features_df = features_df[feature_names]
+	features_df = features_df[feature_names] if not feature_names is None else features_df
 	return features_df
 
 def get_mhps_features(lcobjb,
