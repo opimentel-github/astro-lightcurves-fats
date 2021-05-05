@@ -26,10 +26,8 @@ def get_spm_features(lcobjb,
 	try:
 		spm_names = get_features_keys()
 		fit_error = sne_model.fit(lcobjb.days, lcobjb.obs, lcobjb.obse)
-		#print(fit_error)
 		spm_params = sne_model.get_model_parameters()+[fit_error]
 		spm_params = {spm:spm_params[k] for k,spm in enumerate(spm_names)}
-		#print(spm_params)
 		features_df = pd.DataFrame.from_dict({'':spm_params}, orient='index')
 	except:
 		features_df = get_null_df(spm_names)
@@ -55,9 +53,7 @@ def get_mhps_features(lcobjb,
 	return features_df
 
 def get_fats_features(lcobjb):
-	#if len(lcobjb)==0
-	feature_names = list(set(C_.ALERCE_SPM_FEATURES+C_.OLD_FEATURES+C_.ALERCE_FEATURES))
-	feature_space = turbofats.FeatureSpace(feature_names)
+	feature_space = turbofats.FeatureSpace(C_.FATS_FEATURES)
 	detections_data = np.concatenate([lcobjb.days[...,None], lcobjb.obs[...,None], lcobjb.obse[...,None]], axis=-1)
 	detections = pd.DataFrame(
 		data=detections_data,
