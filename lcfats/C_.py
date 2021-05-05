@@ -20,6 +20,7 @@ SNE_SELECTED_FEATURES = [
 	'LinearTrend',
 	'GP_DRW_sigma', # slow
 	'GP_DRW_tau', # slow
+	
 	'SPM_t0',
 	'SPM_A',
 	'SPM_chi',
@@ -27,6 +28,7 @@ SNE_SELECTED_FEATURES = [
 	'SPM_tau_rise',
 	'SPM_tau_fall',
 	'SPM_beta_r',
+
 	'MHPS_PN_flag',
 	'MHPS_high',
 	'MHPS_low',
