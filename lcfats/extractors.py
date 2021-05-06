@@ -139,6 +139,7 @@ def get_features(lcobj_name, lcobj, lcset_name, lcset_info):
 
 		### spm
 		spm_df_b = get_spm_features(lcobjb)
+		print('spm_df_b',spm_df_b)
 		df_to_cat.append(spm_df_b)
 
 		### mhps

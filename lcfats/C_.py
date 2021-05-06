@@ -5,7 +5,6 @@ import numpy as np
 
 MAX_DAY = 100.
 EPS = 1e-5
-NAN_VALUE = -999
 REC_LOSS_EPS = .01 # ***
 
 ### JOBLIB
@@ -15,11 +14,11 @@ N_JOBS = -1 # The number of jobs to use for the computation. If -1 all CPUs are 
 CHUNK_SIZE = os.cpu_count() if N_JOBS<0 else N_JOBS
 
 SNE_SELECTED_FEATURES = [
-	#'SF_ML_amplitude',
-	#'IAR_phi',
-	#'LinearTrend',
-	#'GP_DRW_sigma', # slow
-	#'GP_DRW_tau', # slow
+	'SF_ML_amplitude',
+	'IAR_phi',
+	'LinearTrend',
+	'GP_DRW_sigma', # slow
+	'GP_DRW_tau', # slow
 	
 	'SPM_t0',
 	'SPM_A',
@@ -29,11 +28,11 @@ SNE_SELECTED_FEATURES = [
 	'SPM_tau_fall',
 	'SPM_beta',
 
-	#'MHPS_PN_flag',
-	#'MHPS_high',
-	#'MHPS_low',
-	#'MHPS_non_zero',
-	#'MHPS_ratio',
+	'MHPS_PN_flag',
+	'MHPS_high',
+	'MHPS_low',
+	'MHPS_non_zero',
+	'MHPS_ratio',
 	]
 
 ALERCE_SPM_FEATURES = [

@@ -4,7 +4,7 @@ scipy~=1.5.2
 Cython~=0.29.21
 joblib~=0.17.0
 imbalanced-learn~=0.7.0
-#umap
+umap-learn~=0.5.1
 
 #eggs
 #-e git://github.com/opimentel-github/flaming-choripan.git#egg=flaming-choripan

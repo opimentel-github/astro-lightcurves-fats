@@ -59,117 +59,122 @@ def get_synth_objs(obj_r, objs_s,
 				break
 	return objs
 
-###################################################################################################################################################
-
-def plot_projections(maps2d_dict,
-	target_class=None,
-	figsize:tuple=(12,10),
-	alpha=0.75,
-
-	max_samples=4e3,
-	max_real_samples:int=250,
-	max_synth_samples:int=2,
-	):
-	fig, axs = plt.subplots(1, 1, figsize=figsize)
-	class_names = maps2d_dict['class_names']
-	for kc,c in enumerate(class_names):
-		ax = axs
-		if target_class is None:
-			plot_projections_c(ax, maps2d_dict, c, max_samples=max_samples, alpha=alpha)
-		else:
-			if c==target_class:
-				plot_net_projections_c(ax, maps2d_dict, c, alpha=alpha)
-			else:
-				plot_projections_c(ax, maps2d_dict, c, 'k', max_samples=max_samples, alpha=0.5)
-
-	method_name = maps2d_dict['method_name']
-	title = f'{method_name}'
-	#title += f'survey: {lcset_train.survey} - set: {set_name_train}'
-	ax.legend()
-	ax.set_title(title)
-	ax.grid(alpha=0.25)
-
-	fig.tight_layout()
-	return fig
-
 def get_standar_style(color, alpha):
-	return {
+	d = {
 		'facecolors':[color],
 		#'edgecolors':'k',
-		's':8,
+		's':5,
 		'alpha':alpha,
 		'marker':'o',
 		'lw':1.5,
 		'linewidth':0.0,
 	}
+	return d
+
+###################################################################################################################################################
+
+def plot_projections(maps2d_dict, lcdataset, s_lcset_name,
+	target_class=None,
+	figsize:tuple=(14,12),
+	marker_alpha=0.8,
+	r_max_samples=np.inf,
+	):
+	r_lcset = lcdataset[s_lcset_name.split('.')[0]]
+	fig, axs = plt.subplots(1, 1, figsize=figsize)
+	class_names = maps2d_dict['class_names']
+	rank_names = []
+	for kc,c in enumerate(class_names):
+		ax = axs
+		p_kwargs = {
+			'r_max_samples':r_max_samples,
+			'marker_alpha':marker_alpha,
+		}
+		if target_class is None:
+			plot_projections_c(ax, maps2d_dict, c, **p_kwargs)
+		else:
+			if c==target_class:
+				rank_names = plot_projections_c(ax, maps2d_dict, c, uses_net=True, **p_kwargs)
+			else:
+				plot_projections_c(ax, maps2d_dict, c, color='k', **p_kwargs)
+
+	method_name = maps2d_dict['method_name']
+	title = ''
+	title += f'{method_name}'+'\n'
+	title += f'survey={r_lcset.survey}-{"".join(r_lcset.band_names)} [{s_lcset_name}]'+'\n'
+	if len(rank_names)>0:
+		title += f'dist-rank=[{", ".join(rank_names)}]'+'\n'  
+	ax.legend()
+	ax.set_title(title[:-1])
+	ax.grid(alpha=0.25)
+	fig.tight_layout()
+	return fig
 
 def plot_projections_c(ax, maps2d_dict, c,
 	color=None,
-	alpha=0.9,
-	max_samples=1e3,
+	marker_alpha=0.9,
+	r_max_samples=np.inf,
+	s_max_samples=1,
+	uses_net=False,
+	net_alpha=0.25,
+	rank=3,
+	fontsize=12,
 	):
+	net_alpha = 0.05 if c in ['SNIa'] else net_alpha # fixme
 	map_lcobj_names = maps2d_dict['map_lcobj_names']
 	class_names = maps2d_dict['class_names']
 	map_x = maps2d_dict['map_x']
 	labels = maps2d_dict['y']
-	counter = 0
-
-	### plot all
-	for idx,lcobj_name in enumerate(map_lcobj_names):
-		if any([not class_names[labels[idx]]==c, counter>max_samples]):
-			continue
-		color = cc.get_default_colorlist()[labels[idx]] if color is None else color
-		map_x_ = map_x[idx]
-		ax.scatter(map_x_[0], map_x_[1], **get_standar_style(color, alpha), label=f'{c} [real & synth]' if counter==0 else None)
-		counter += 1
-
-def plot_net_projections_c(ax, maps2d_dict, c,
-	alpha=0.9,
-	max_real_samples:int=250,
-	max_synth_samples:int=1,
-	):
-	map_lcobj_names = maps2d_dict['map_lcobj_names']
-	class_names = maps2d_dict['class_names']
-	map_x = maps2d_dict['map_x']
-	labels = maps2d_dict['y']
-	real_counter = 0
+	r_counter = 0
 	dist_rank = TopRank()
 
 	### plot all
 	for idx,lcobj_name in enumerate(map_lcobj_names):
-		is_synthetic = '.' in lcobj_name
-		if any([not class_names[labels[idx]]==c, real_counter>max_real_samples, is_synthetic]):
+		if '.' in lcobj_name: # is synthetic
+			continue
+		if r_counter>r_max_samples:
+			continue
+		if not class_names[labels[idx]]==c:
 			continue
 
-		color = cc.get_default_colorlist()[labels[idx]]
-		style = { # circle
+		color = cc.get_default_colorlist()[labels[idx]] if color is None else color
+		r_style = { # circle
 			'facecolors':'None',
 			'edgecolors':[color],
 			#edgecolors='k',
-			's':55,
-			'alpha':1.,
+			's':30,
+			'alpha':marker_alpha,
 			'marker':'o',
 			'linewidth':1,
 			#label=f'{c}' if not has_label[b][c] else None,
 		}
 		map_x_real = map_x[idx]
-		ax.scatter(map_x_real[0], map_x_real[1], **style, label=f'{c} [real]' if real_counter==0 else None)
+		ax.scatter(map_x_real[0], map_x_real[1], **r_style, label=f'{c} [real]' if r_counter==0 else None)
 
 		### plot synthetics
-		lcobj_names_synth = get_synth_objs(lcobj_name, maps2d_dict['s_lcobj_names'], max_synth_samples)
+		lcobj_names_synth = get_synth_objs(lcobj_name, maps2d_dict['s_lcobj_names'], s_max_samples)
 		for ks,lcobj_name_synth in enumerate(lcobj_names_synth):
 			idx = map_lcobj_names.index(lcobj_name_synth)
 			map_x_synth = map_x[idx]
-			ax.scatter(map_x_synth[0], map_x_synth[1], **get_standar_style(color, alpha), label=f'{c} [synth]' if real_counter==0 and ks==0 else None)
-			dist = (map_x_real[0]-map_x_synth[0])**2+(map_x_real[1]-map_x_synth[1])**2
-			line = ax.plot([map_x_real[0], map_x_synth[0]], [map_x_real[1], map_x_synth[1]], alpha=alpha, lw=0.5, c=color, label=f'{c} real-synth' if real_counter==0 and ks==0  else None)
-			dist_rank.append(lcobj_name_synth, dist, [map_x_synth[0], map_x_synth[1]])
+			ax.scatter(map_x_synth[0], map_x_synth[1], **get_standar_style(color, marker_alpha), label=f'{c} [synth]' if r_counter==0 and ks==0 else None)
+			if uses_net:
+				dx = map_x_real[0]-map_x_synth[0]
+				dy = map_x_real[1]-map_x_synth[1]
+				dist = dx**2+dy**2
+				line = ax.plot([map_x_real[0], map_x_synth[0]], [map_x_real[1], map_x_synth[1]], alpha=net_alpha, lw=0.5, c=color)
+				ax.plot([None], [None], alpha=marker_alpha, lw=0.5, c=color, label=f'{c} real-synth' if r_counter==0 and ks==0  else None)
+				dist_rank.append(lcobj_name_synth, dist, {'pos':(map_x_synth[0], map_x_synth[1]), 'line':line[0]})
 
-		real_counter += 1
+		r_counter += 1
 
-	dist_rank.calcule()
-	#print(dist_rank)
-	for k in range(3):
-		name, value, info = dist_rank[k]
-		txt = ax.text(*info, name, horizontalalignment='center', fontsize=13, c=color)
-		txt.set_path_effects([PathEffects.withStroke(linewidth=3, foreground='w')])
+	### rank
+	rank_names = []
+	if uses_net:
+		dist_rank.calcule()
+		for k in range(0, rank):
+			name, value, info = dist_rank[k]
+			rank_names += [name]
+			info['line'].set_alpha(marker_alpha)
+			txt = ax.text(*info['pos'], name, horizontalalignment='center', fontsize=fontsize, c=color)
+			txt.set_path_effects([PathEffects.withStroke(linewidth=3, foreground='w')])
+
+	return rank_names

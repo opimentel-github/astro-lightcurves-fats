@@ -17,7 +17,9 @@ def get_multiband_features(invalid_features,
 			x.append(f'{i}_{b}')
 	return x
 
-def load_features(filedir, mode):
+def load_features(filedir,
+	mode='all',
+	):
 	df_xy = pd.read_parquet(os.path.abspath(f'{filedir}')) # parquet
 	columns = list(df_xy.columns)
 	y_columns = ['_y', '_fullsynth']

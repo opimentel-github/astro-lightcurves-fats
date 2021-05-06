@@ -3,12 +3,13 @@ from __future__ import division
 from . import C_
 
 import numpy as np
-from sklearn.preprocessing import QuantileTransformer, StandardScaler, MinMaxScaler
-from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import QuantileTransformer, StandardScaler
 from sklearn.decomposition import PCA, KernelPCA, FastICA
 from sklearn.manifold import TSNE
 from umap import UMAP
 from .files import load_features
+from flamingchoripan.dataframes import clean_df_nans
+import pandas as pd
 
 ###################################################################################################################################################
 
@@ -24,12 +25,10 @@ def get_fitted_maps2d(lcdataset, s_lcset_name, load_rootdir,
 	):
 	r_lcset_name = s_lcset_name.split('.')[0]
 	r_lcset = lcdataset[r_lcset_name]
-	s_lcset = lcdataset[s_lcset_name]
 
-	#map_scaler = QuantileTransformer(n_quantiles=5000, random_state=random_state, output_distribution='normal')
-	map_scaler = QuantileTransformer(n_quantiles=5000, random_state=random_state, output_distribution='uniform')
-	#map_scaler = StandardScaler()
-	#map_scaler = MinMaxScaler()
+	#map_scaler = QuantileTransformer(n_quantiles=5000, random_state=random_state, output_distribution='normal') # slow
+	#map_scaler = QuantileTransformer(n_quantiles=5000, random_state=random_state, output_distribution='uniform') # slow
+	map_scaler = StandardScaler()
 
 	#map_pca = FastICA(n_components=2)#, kernel='rbf', gamma=0.1)
 	#map_pca = PCA(n_components=3)
@@ -43,14 +42,11 @@ def get_fitted_maps2d(lcdataset, s_lcset_name, load_rootdir,
 	s_df_x, s_df_y = load_features(f'{load_rootdir}/{s_lcset_name}.df')
 	s_lcobj_names = list(s_df_x.index)
 
-	map_lcobj_names = r_lcobj_names+s_lcobj_names
-	x = np.concatenate([r_df_x.values, s_df_x.values], axis=0)
-	y = np.concatenate([r_df_y.values, s_df_y.values], axis=0)[...,0]
-
-	for missing_values in [-C_.NAN_VALUE, C_.NAN_VALUE]:
-		x = SimpleImputer(missing_values=missing_values, strategy='median').fit_transform(x)
-
-	x = map_scaler.fit_transform(x)
+	df_x = pd.concat([r_df_x, s_df_x], axis='rows')
+	df_y = pd.concat([r_df_y, s_df_y], axis='rows')
+	df_x, _, _ = clean_df_nans(df_x, mode='median')
+	x = map_scaler.fit_transform(df_x.values)
+	y = df_y.values[...,0]
 
 	if mode=='pca+umap':
 		map_kwargs = {
@@ -60,10 +56,11 @@ def get_fitted_maps2d(lcdataset, s_lcset_name, load_rootdir,
 			'random_state':random_state,
 			'transform_seed':random_state,
 		}
+		in_dims = x.shape[-1]
 		pca = PCA(n_components=pre_out_dims)
 		map_obj = UMAP(n_components=out_dims, **map_kwargs)
 		#method_name = '$\\text{PCA}_{'+str(pre_out_dims)+'}\\to\\text{UMAP}_{'+str(out_dims)+'}$'
-		method_name = '$PCA_{'+str(pre_out_dims)+'} + UMAP_{'+str(out_dims)+'}$ projection of FATS features\n'
+		method_name = '$PCA_{'+str(in_dims)+'\\to'+str(pre_out_dims)+'} + UMAP_{'+str(pre_out_dims)+'\\to'+str(out_dims)+'}$ projection of features\n'
 		method_name += f'metric={metric} - min-dist={min_dist:.3f} - n-neighbors={int(n_neighbors)}'
 		map_x = map_obj.fit_transform(pca.fit_transform(x), y=y)
 		
@@ -96,7 +93,7 @@ def get_fitted_maps2d(lcdataset, s_lcset_name, load_rootdir,
 		'method_name':method_name,
 		'scaler':map_scaler,
 		'map_obj':map_obj,
-		'map_lcobj_names':map_lcobj_names,
+		'map_lcobj_names':r_lcobj_names+s_lcobj_names,
 		'map_x':map_x,
 		'y':y,
 		'class_names':r_lcset.class_names,

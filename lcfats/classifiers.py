@@ -7,20 +7,11 @@ from imblearn.ensemble import BalancedRandomForestClassifier
 from sklearn.ensemble import RandomForestClassifier
 from flamingchoripan.datascience.ranks import TopRank
 from flamingchoripan.datascience.metrics import get_multiclass_metrics
+from flamingchoripan.dataframes import clean_df_nans
 import numpy as np
 import random
 
 ###################################################################################################################################################
-
-def clean_df_nans(df, df_values,
-	nan_mode='value', # value, mean
-	nan_value=C_.NAN_VALUE,
-	):
-	if nan_mode=='value':
-		df = df.replace([np.inf, -np.inf], np.nan)
-		return df.fillna(nan_value)
-	elif nan_mode=='mean':
-		return df.fillna(df_values)
 
 def train_classifier(train_df_x, train_df_y,
 	nan_mode='value', # value, mean
@@ -40,12 +31,10 @@ def train_classifier(train_df_x, train_df_y,
 	}
 
 	brf = BalancedRandomForestClassifier(**brf_kwargs)
-	mean_train_df_x = train_df_x.mean(axis='index', skipna=True)
+	train_df_x, mean_train_df_x, null_cols = clean_df_nans(train_df_x, mode=nan_mode)
+	#print('null_cols',null_cols)
 	#with pd.option_context('display.max_rows', None, 'display.max_columns', None):
 	#	print('mean_train_df_x',mean_train_df_x)
-	null_cols = list(train_df_x.columns[train_df_x.isnull().all()])
-	#print('null_cols',null_cols)
-	train_df_x = clean_df_nans(train_df_x, mean_train_df_x, nan_mode)
 	brf.fit(train_df_x.values, train_df_y[['_y']].values[...,0])
 	d = {
 		'brf':brf,
@@ -61,7 +50,7 @@ def evaluate_classifier(brf_d, eval_df_x, eval_df_y, lcset_info,
 	mean_train_df_x = brf_d['mean_train_df_x']
 	class_names = lcset_info['class_names']
 	y_target = eval_df_y[['_y']].values[...,0]
-	eval_df_x = clean_df_nans(eval_df_x, mean_train_df_x, nan_mode)
+	eval_df_x, _, _ = clean_df_nans(eval_df_x, mode=nan_mode, df_values=mean_train_df_x)
 	y_pred_p = brf.predict_proba(eval_df_x.values)
 	y_pred = np.argmax(y_pred_p, axis=-1)
 
