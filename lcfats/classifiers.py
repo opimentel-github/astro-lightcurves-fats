@@ -44,7 +44,7 @@ def train_classifier(train_df_x, train_df_y,
 	#with pd.option_context('display.max_rows', None, 'display.max_columns', None):
 	#	print('mean_train_df_x',mean_train_df_x)
 	null_cols = list(train_df_x.columns[train_df_x.isnull().all()])
-	print('null_cols',null_cols)
+	#print('null_cols',null_cols)
 	train_df_x = clean_df_nans(train_df_x, mean_train_df_x, nan_mode)
 	brf.fit(train_df_x.values, train_df_y[['_y']].values[...,0])
 	d = {

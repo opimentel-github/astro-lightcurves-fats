@@ -138,11 +138,11 @@ def get_features(lcobj_name, lcobj, lcset_name, lcset_info):
 		df_to_cat.append(fats_df_b)
 
 		### spm
-		spm_df_b = get_spm_features(lcobjb) # ['SPM_beta', 'SPM_t0', 'SPM_tau_rise', 'SPM_tau_fall']
+		spm_df_b = get_spm_features(lcobjb)
 		df_to_cat.append(spm_df_b)
 
 		### mhps
-		mhps_df_b = get_mhps_features(lcobjb) # ['MHPS_low', 'MHPS_ratio']
+		mhps_df_b = get_mhps_features(lcobjb)
 		df_to_cat.append(mhps_df_b)
 
 		### custom

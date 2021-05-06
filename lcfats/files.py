@@ -8,10 +8,12 @@ import os
 
 ###################################################################################################################################################
 
-def get_multiband_features(invalid_features):
+def get_multiband_features(invalid_features,
+	band_names=['g', 'r'],
+	):
 	x = []
 	for i in invalid_features:
-		for b in ['g', 'r']:
+		for b in band_names:
 			x.append(f'{i}_{b}')
 	return x
 
