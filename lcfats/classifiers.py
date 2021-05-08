@@ -18,16 +18,16 @@ def train_classifier(train_df_x, train_df_y,
 	):
 	brf_kwargs = {
 		'n_jobs':C_.N_JOBS,
-		'n_estimators':2000, # 1000
-		#'max_depth':10, #
-		'max_features':None,
-		#'max_features':'auto',
+		'n_estimators':25, # 1000 2500 5000
+		'max_features':'log2', # None auto
 		'criterion':'entropy', # entropy gini
 		#'min_samples_split':2,
-		#'min_samples_leaf':1,
+		'min_samples_leaf':5, # 1 2 5 10 20 50
 		#'verbose':1,
+		'sampling_strategy':'not minority',
 		'bootstrap':True,
-		'max_samples':500, # REALLY IMPORTANT PARAMETER
+		'replacement':True,
+		'max_samples':None, # ***
 	}
 
 	brf = BalancedRandomForestClassifier(**brf_kwargs)

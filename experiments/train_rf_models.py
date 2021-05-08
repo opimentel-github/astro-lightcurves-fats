@@ -21,28 +21,14 @@ if __name__== '__main__':
 	###################################################################################################################################################
 	import numpy as np
 	from flamingchoripan.files import load_pickle, save_pickle, get_dict_from_filedir
-
-	filedir = f'../../surveys-save/survey=alerceZTFv7.1~bands=gr~mode=onlySNe.splcds'
-	filedict = get_dict_from_filedir(filedir)
-	rootdir = filedict['_rootdir']
-	cfilename = filedict['_cfilename']
-	survey = filedict['survey']
-	lcdataset = load_pickle(filedir)
-	print(lcdataset)
-
-	###################################################################################################################################################
-	import numpy as np
-	from flamingchoripan.files import load_pickle, save_pickle
-	from flamingchoripan.files import get_dict_from_filedir
 	from lcfats.files import load_features
 	from flamingchoripan.progress_bars import ProgressBar
 	from lcfats.classifiers import train_classifier, evaluate_classifier
 	import pandas as pd
 
-	kfs = lcdataset.kfolds if main_args.kf=='.' else main_args.kf
+	kfs = list(range(0, 5)) if main_args.kf=='.' else main_args.kf
 	kfs = [kfs] if isinstance(kfs, str) else kfs
-	#methods = ['linear-fstw', 'bspline-fstw', 'spm-mle-fstw', 'spm-mle-estw', 'spm-mcmc-fstw', 'spm-mcmc-estw'] if main_args.method=='.' else main_args.method
-	methods = ['linear-fstw', 'bspline-fstw', 'spm-mcmc-fstw', 'spm-mcmc-estw'] if main_args.method=='.' else main_args.method
+	methods = ['linear-fstw', 'bspline-fstw', 'spm-mle-fstw', 'spm-mle-estw', 'spm-mcmc-fstw', 'spm-mcmc-estw'] if main_args.method=='.' else main_args.method
 	methods = [methods] if isinstance(methods, str) else methods
 
 	for kf in kfs:
@@ -62,18 +48,20 @@ if __name__== '__main__':
 				model_ids = list(range(*[int(mi) for mi in main_args.mids.split('-')]))
 				bar = ProgressBar(len(model_ids))
 				for ki,model_id in enumerate(model_ids): # IDS
+					train_df_x_r, train_df_y_r = load_features(f'../save/fats/{cfilename}/{kf}@train.df', main_args.mode)
+					train_df_x_s, train_df_y_s = load_features(f'../save/fats/{cfilename}/{kf}@train.{method}.df', main_args.mode)
+					s_repeats = len(train_df_x_s)//len(train_df_x_r)
 					if train_config=='r':
-						train_df_x, train_df_y = load_features(f'../save/fats/{cfilename}/{kf}@train.df', main_args.mode)
+						train_df_x = pd.concat([train_df_x_r]*s_repeats*2, axis='rows')
+						train_df_y = pd.concat([train_df_y_r]*s_repeats*2, axis='rows')
 
 					if train_config=='s':
-						train_df_x, train_df_y = load_features(f'../save/fats/{cfilename}/{kf}@train.{method}.df', main_args.mode)
+						train_df_x = pd.concat([train_df_x_s]*2, axis='rows')
+						train_df_y = pd.concat([train_df_y_s]*2, axis='rows')
 
 					if train_config=='r+s':
-						train_df_x_r, train_df_y_r = load_features(f'../save/fats/{cfilename}/{kf}@train.df', main_args.mode)
-						train_df_x_s, train_df_y_s = load_features(f'../save/fats/{cfilename}/{kf}@train.{method}.df', main_args.mode)
-						repeats = len(train_df_x_s)//len(train_df_x_r)
-						train_df_x = pd.concat([train_df_x_r]*repeats+[train_df_x_s], axis=0)
-						train_df_y = pd.concat([train_df_y_r]*repeats+[train_df_y_s], axis=0)
+						train_df_x = pd.concat([train_df_x_r]*s_repeats+[train_df_x_s], axis='rows')
+						train_df_y = pd.concat([train_df_y_r]*s_repeats+[train_df_y_s], axis='rows')
 
 					val_df_x, val_df_y = load_features(f'../save/fats/{cfilename}/{kf}@val.df', main_args.mode)
 					test_df_x, test_df_y = load_features(f'../save/fats/{cfilename}/{kf}@test.df', main_args.mode)

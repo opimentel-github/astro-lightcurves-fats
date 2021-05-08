@@ -14,12 +14,6 @@ N_JOBS = -1 # The number of jobs to use for the computation. If -1 all CPUs are 
 CHUNK_SIZE = os.cpu_count() if N_JOBS<0 else N_JOBS
 
 SNE_SELECTED_FEATURES = [
-	'SF_ML_amplitude',
-	'IAR_phi',
-	'LinearTrend',
-	'GP_DRW_sigma', # slow
-	'GP_DRW_tau', # slow
-	
 	'SPM_t0',
 	'SPM_A',
 	'SPM_chi',
@@ -28,11 +22,18 @@ SNE_SELECTED_FEATURES = [
 	'SPM_tau_fall',
 	'SPM_beta',
 
-	'MHPS_PN_flag',
-	'MHPS_high',
-	'MHPS_low',
-	'MHPS_non_zero',
+	'LinearTrend',
+	'IAR_phi',
 	'MHPS_ratio',
+	'GP_DRW_tau', # slow
+	#'GP_DRW_sigma', # slow
+
+	'MHPS_low',
+	#'MHPS_PN_flag',
+	#'MHPS_high',
+	#'MHPS_non_zero',
+
+	'SF_ML_amplitude',
 	]
 
 ALERCE_SPM_FEATURES = [
