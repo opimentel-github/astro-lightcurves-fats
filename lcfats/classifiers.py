@@ -18,7 +18,7 @@ def train_classifier(train_df_x, train_df_y,
 	):
 	brf_kwargs = {
 		'n_jobs':C_.N_JOBS,
-		'n_estimators':1000, # 100 500 1000
+		'n_estimators':2000, # 100 500 1000
 		'max_features':'log2', # None auto
 		'criterion':'entropy', # entropy gini
 		#'min_samples_split':2,
