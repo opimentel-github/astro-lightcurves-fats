@@ -18,7 +18,7 @@ def train_classifier(train_df_x, train_df_y,
 	):
 	brf_kwargs = {
 		'n_jobs':C_.N_JOBS,
-		'n_estimators':25, # 1000 2500 5000
+		'n_estimators':1000, # 100 500 1000
 		'max_features':'log2', # None auto
 		'criterion':'entropy', # entropy gini
 		#'min_samples_split':2,
@@ -52,11 +52,11 @@ def evaluate_classifier(brf_d, eval_df_x, eval_df_y, lcset_info,
 	y_target = eval_df_y[['_y']].values[...,0]
 	eval_df_x, _, _ = clean_df_nans(eval_df_x, mode=nan_mode, df_values=mean_train_df_x)
 	y_pred_p = brf.predict_proba(eval_df_x.values)
-	y_pred = np.argmax(y_pred_p, axis=-1)
 
+	y_pred = np.argmax(y_pred_p, axis=-1)
 	wrongs_indexs = ~(y_target==y_pred)
 	wrongs_df = eval_df_y[wrongs_indexs]
-	metrics_cdict, metrics_dict, cm = get_multiclass_metrics(y_pred, y_target, class_names, pred_is_onehot=False, y_pred_p=y_pred_p)
+	metrics_cdict, metrics_dict, cm = get_multiclass_metrics(y_pred_p, y_target, class_names)
 
 	### results
 	features = list(eval_df_x.columns)

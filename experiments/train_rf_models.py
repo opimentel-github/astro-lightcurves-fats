@@ -77,8 +77,10 @@ if __name__== '__main__':
 					results_test = evaluate_classifier(brf_d, test_df_x, test_df_y, lcset_info, **fit_kwargs)
 					save_pickle(f'../save/exp=rf_eval~train_config={train_config}~mode={main_args.mode}/{cfilename}/{kf}@test/id={model_id}.df', results_test)
 
-					accu = results_test['metrics_dict']['b-accuracy']
-					bar(f'kf={kf} - mode={main_args.mode} - method={method} - train_config={train_config} - model_id={model_id} - test-accu={accu} - samples={len(train_df_y)} - features=({len(features)}#){features}')
+					metrics_dict = results_test['metrics_dict']
+					#print(metrics_dict)
+					brecall = metrics_dict['b-recall']
+					bar(f'kf={kf} - mode={main_args.mode} - method={method} - train_config={train_config} - model_id={model_id} - b-recall={brecall} - samples={len(train_df_y)} - features=({len(features)}#){features}')
 
 				bar.done()
 

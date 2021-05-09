@@ -14,11 +14,11 @@ import pandas as pd
 ###################################################################################################################################################
 
 def get_fitted_maps2d(lcdataset, s_lcset_name, load_rootdir,
-	mode='pca+umap',
+	features_mode='all',
+	proj_mode='pca+umap',
 	random_state=0,
 	pre_out_dims=10,
 	out_dims=2,
-
 	metric='euclidean', # default: euclidean
 	min_dist=0.1, # default: 0.1
 	n_neighbors=15, # default: 15
@@ -36,10 +36,10 @@ def get_fitted_maps2d(lcdataset, s_lcset_name, load_rootdir,
 	#map_umap = UMAP(n_components=2, **umap_kwargs)
 	#map_tsne = TSNE(n_components=2, **tsne_kwargs)
 
-	r_df_x, r_df_y = load_features(f'{load_rootdir}/{r_lcset_name}.df')
+	r_df_x, r_df_y = load_features(f'{load_rootdir}/{r_lcset_name}.df', features_mode)
 	r_lcobj_names = list(r_df_x.index)
 
-	s_df_x, s_df_y = load_features(f'{load_rootdir}/{s_lcset_name}.df')
+	s_df_x, s_df_y = load_features(f'{load_rootdir}/{s_lcset_name}.df', features_mode)
 	s_lcobj_names = list(s_df_x.index)
 
 	df_x = pd.concat([r_df_x, s_df_x], axis='rows')
@@ -48,7 +48,7 @@ def get_fitted_maps2d(lcdataset, s_lcset_name, load_rootdir,
 	x = map_scaler.fit_transform(df_x.values)
 	y = df_y.values[...,0]
 
-	if mode=='pca+umap':
+	if proj_mode=='pca+umap':
 		map_kwargs = {
 			'metric':metric,
 			'min_dist':min_dist,
@@ -65,7 +65,7 @@ def get_fitted_maps2d(lcdataset, s_lcset_name, load_rootdir,
 		map_x = map_obj.fit_transform(pca.fit_transform(x), y=y)
 		
 	'''
-	elif mode=='umap':
+	elif proj_mode=='umap':
 		map_kwargs = {
 			'metric':metric,
 			'min_dist':min_dist,
@@ -79,7 +79,7 @@ def get_fitted_maps2d(lcdataset, s_lcset_name, load_rootdir,
 
 
 
-	elif mode=='tsne':
+	elif proj_mode=='tsne':
 		map_kwargs = {
 			'perplexity':50.0, # default: 30
 			'random_state':random_state,
