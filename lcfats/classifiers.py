@@ -16,18 +16,20 @@ import random
 def train_classifier(train_df_x, train_df_y,
 	nan_mode='value', # value, mean
 	):
-	brf_kwargs = {
+	brf_kwargs = { # same as ALERCE
+		'n_estimators':500, # 500 1000 2000
+		'max_features':'auto', # None auto
+		'max_depth':None,
 		'n_jobs':C_.N_JOBS,
-		'n_estimators':2000, # 100 500 1000
-		'max_features':'log2', # None auto
-		'criterion':'entropy', # entropy gini
-		#'min_samples_split':2,
-		'min_samples_leaf':5, # 1 2 5 10 20 50
+		'class_weight':None,
+		'criterion':'entropy',
+		'min_samples_split':2,
+		'min_samples_leaf':1,
+		#'sampling_strategy':'not minority',
+		#'bootstrap':True,
+		#'replacement':True,
+		#'max_samples':None, # ***
 		#'verbose':1,
-		'sampling_strategy':'not minority',
-		'bootstrap':True,
-		'replacement':True,
-		'max_samples':None, # ***
 	}
 
 	brf = BalancedRandomForestClassifier(**brf_kwargs)

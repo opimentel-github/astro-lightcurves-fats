@@ -66,13 +66,12 @@ if __name__== '__main__':
 					val_df_x, val_df_y = load_features(f'../save/fats/{cfilename}/{kf}@val.df', main_args.mode)
 					test_df_x, test_df_y = load_features(f'../save/fats/{cfilename}/{kf}@test.df', main_args.mode)
 
-					#print(list(train_df_x.columns))
 					fit_kwargs = {}
 					features = list(train_df_x.columns)
 					brf_d = train_classifier(train_df_x, train_df_y, **fit_kwargs)
 
-					results_val = evaluate_classifier(brf_d, val_df_x, val_df_y, lcset_info, **fit_kwargs)
-					save_pickle(f'../save/exp=rf_eval~train_config={train_config}~mode={main_args.mode}/{cfilename}/{kf}@val/id={model_id}.df', results_val)
+					#results_val = evaluate_classifier(brf_d, val_df_x, val_df_y, lcset_info, **fit_kwargs)
+					#save_pickle(f'../save/exp=rf_eval~train_config={train_config}~mode={main_args.mode}/{cfilename}/{kf}@val/id={model_id}.df', results_val)
 
 					results_test = evaluate_classifier(brf_d, test_df_x, test_df_y, lcset_info, **fit_kwargs)
 					save_pickle(f'../save/exp=rf_eval~train_config={train_config}~mode={main_args.mode}/{cfilename}/{kf}@test/id={model_id}.df', results_test)
