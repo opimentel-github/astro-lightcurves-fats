@@ -16,8 +16,9 @@ import random
 def train_classifier(train_df_x, train_df_y,
 	nan_mode='value', # value, mean
 	):
+	min_population_samples = min(np.unique(train_df_y['_y'].values, return_counts=True)[-1])
 	brf_kwargs = { # same as ALERCE
-		'n_estimators':500, # 500 1000 2000
+		'n_estimators':2000, # 500 1000 2000
 		'max_features':'auto', # None auto
 		'max_depth':None,
 		'n_jobs':C_.N_JOBS,
@@ -28,10 +29,9 @@ def train_classifier(train_df_x, train_df_y,
 		#'sampling_strategy':'not minority',
 		#'bootstrap':True,
 		#'replacement':True,
-		#'max_samples':None, # ***
+		'max_samples':min_population_samples, # ***
 		#'verbose':1,
 	}
-
 	brf = BalancedRandomForestClassifier(**brf_kwargs)
 	train_df_x, mean_train_df_x, null_cols = clean_df_nans(train_df_x, mode=nan_mode)
 	#print('null_cols',null_cols)
