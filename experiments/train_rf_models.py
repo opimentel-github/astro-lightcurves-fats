@@ -26,9 +26,10 @@ if __name__== '__main__':
 	from lcfats.classifiers import train_classifier, evaluate_classifier
 	import pandas as pd
 
-	kfs = list(range(0, 5)) if main_args.kf=='.' else main_args.kf
+	kfs = [str(kf) for kf in range(0, 5)] if main_args.kf=='.' else main_args.kf
 	kfs = [kfs] if isinstance(kfs, str) else kfs
-	methods = ['linear-fstw', 'bspline-fstw', 'spm-mle-fstw', 'spm-mle-estw', 'spm-mcmc-fstw', 'spm-mcmc-estw'] if main_args.method=='.' else main_args.method
+	#methods = ['linear-fstw', 'bspline-fstw', 'spm-mle-fstw', 'spm-mle-estw', 'spm-mcmc-fstw', 'spm-mcmc-estw'] if main_args.method=='.' else main_args.method
+	methods = ['linear-fstw', 'bspline-fstw', 'spm-mcmc-fstw', 'spm-mcmc-estw'] if main_args.method=='.' else main_args.method
 	methods = [methods] if isinstance(methods, str) else methods
 
 	for kf in kfs:
@@ -80,6 +81,7 @@ if __name__== '__main__':
 					#print(metrics_dict)
 					brecall = metrics_dict['b-recall']
 					bar(f'kf={kf} - mode={main_args.mode} - method={method} - train_config={train_config} - model_id={model_id} - b-recall={brecall} - samples={len(train_df_y)} - features=({len(features)}#){features}')
+					#assert 0
 
 				bar.done()
 

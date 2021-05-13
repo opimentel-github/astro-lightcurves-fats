@@ -18,7 +18,6 @@ def train_classifier(train_df_x, train_df_y,
 	):
 	min_population_samples = min(np.unique(train_df_y['_y'].values, return_counts=True)[-1])
 	brf_kwargs = { # same as ALERCE
-		'n_estimators':2000, # 500 1000 2000
 		'max_features':'auto', # None auto
 		'max_depth':None,
 		'n_jobs':C_.N_JOBS,
@@ -26,10 +25,13 @@ def train_classifier(train_df_x, train_df_y,
 		'criterion':'entropy',
 		'min_samples_split':2,
 		'min_samples_leaf':1,
+
+		'n_estimators':10000, # 500 1000 2000
 		#'sampling_strategy':'not minority',
-		#'bootstrap':True,
-		#'replacement':True,
-		'max_samples':min_population_samples, # ***
+		'sampling_strategy':'all',
+		'bootstrap':True,
+		'replacement':True,
+		'max_samples':100, # *** # 100 500 1000 min_population_samples
 		#'verbose':1,
 	}
 	brf = BalancedRandomForestClassifier(**brf_kwargs)
