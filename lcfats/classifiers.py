@@ -3,8 +3,12 @@ from __future__ import division
 from . import C_
 
 import pandas as pd
-from imblearn.ensemble import BalancedRandomForestClassifier
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import GridSearchCV
+from imblearn.ensemble import BalancedRandomForestClassifier
+from imblearn.pipeline import make_pipeline as make_pipeline_imb
+from imblearn.under_sampling import RandomUnderSampler, ClusterCentroids
+from imblearn.over_sampling import RandomOverSampler, SMOTE
 from flamingchoripan.datascience.ranks import TopRank
 from flamingchoripan.datascience.metrics import get_multiclass_metrics
 from flamingchoripan.dataframes import clean_df_nans
@@ -14,37 +18,52 @@ from flamingchoripan.dataframes import DFBuilder
 
 ###################################################################################################################################################
 
+NAN_MODE = 'median'
 def train_classifier(train_df_x, train_df_y,
 	nan_mode='value', # value, mean
 	):
-	min_population_samples = min(np.unique(train_df_y['_y'].values, return_counts=True)[-1])
-	brf_kwargs = { # same as ALERCE
+	train_df_x, mean_train_df_x, null_cols = clean_df_nans(train_df_x, mode=NAN_MODE)
+	#min_population_samples = min(np.unique(train_df_y['_y'].values, return_counts=True)[-1])
+	rf_kwargs = { # same as ALERCE
 		'max_features':'auto', # None auto
-		'max_depth':None,
+		'max_depth':2,
 		'n_jobs':C_.N_JOBS,
 		'class_weight':None,
 		'criterion':'entropy',
 		'min_samples_split':2,
 		'min_samples_leaf':1,
 
-		'n_estimators':10, # 500 1000 2000 10000
-		#'sampling_strategy':'not minority',
-		'sampling_strategy':'all',
+		'n_estimators':2000, # 500 1000 2000 5000
 		'bootstrap':True,
-		'replacement':True,
-		'max_samples':100, # *** # 100 500 1000 min_population_samples
+		#'max_samples':10, # *** # 100 500 1000 min_population_samples
 		#'verbose':1,
 	}
-	brf = BalancedRandomForestClassifier(**brf_kwargs)
-	train_df_x, mean_train_df_x, null_cols = clean_df_nans(train_df_x, mode=nan_mode)
-	#print('null_cols',null_cols)
-	#with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-	#	print('mean_train_df_x',mean_train_df_x)
-	brf.fit(train_df_x.values, train_df_y[['_y']].values[...,0])
+	sampling_strategy = 'all' # not minority all
+	rf = RandomForestClassifier(**rf_kwargs)
+	random_sampler = RandomOverSampler(sampling_strategy=sampling_strategy) # RandomOverSampler SMOTE
+	x_rs, y_rs = random_sampler.fit_resample(train_df_x.values, train_df_y[['_y']].values[...,0])
+	#brf = make_pipeline_imb(random_sampler, rf)
+	param_grid = {
+		'max_depth':[1,2,5,10,15,20],
+		}
+	#grid_clf = GridSearchCV(rf, param_grid, cv=5)
+	#grid_clf.fit(x_rs, y_rs)
+	#rf = grid_clf.best_estimator_
+	
+	rf.fit(x_rs, y_rs)
+	
+	#brf.fit(train_df_x.values, train_df_y[['_y']].values[...,0])
+
+	features = list(train_df_x.columns)
+	rank = TopRank('features')
+	rank.add_list(features, rf.feature_importances_)
+	rank.calcule()
 	d = {
-		'brf':brf,
+		'brf':rf,
 		'mean_train_df_x':mean_train_df_x,
 		'null_cols':null_cols,
+		'features':features,
+		'rank':rank,
 		}
 	return d
 
@@ -55,7 +74,7 @@ def evaluate_classifier(brf_d, eval_df_x, eval_df_y, lcset_info,
 	mean_train_df_x = brf_d['mean_train_df_x']
 	class_names = lcset_info['class_names']
 	y_target = eval_df_y[['_y']].values[...,0]
-	eval_df_x, _, _ = clean_df_nans(eval_df_x, mode=nan_mode, df_values=mean_train_df_x)
+	eval_df_x, _, _ = clean_df_nans(eval_df_x, mode=NAN_MODE, df_values=mean_train_df_x)
 	y_pred_p = brf.predict_proba(eval_df_x.values)
 	metrics_cdict, metrics_dict, cm = get_multiclass_metrics(y_pred_p, y_target, class_names)
 
@@ -68,22 +87,53 @@ def evaluate_classifier(brf_d, eval_df_x, eval_df_y, lcset_info,
 	for kwc,wc in enumerate(wrong_classification):
 		if wc:
 			wrongs_df.append(lcobj_names[kwc], {'y_target':class_names[y_target[kwc]], 'y_pred':class_names[y_pred[kwc]]})
-	wrongs_df.get_df()
-	print(wrongs_df)
-	assert 0
 
 	### results
-	features = list(eval_df_x.columns)
-	rank = TopRank('features')
-	rank.add_list(features, brf.feature_importances_)
-	rank.calcule()
 	d = {
-		'wrongs_df':wrongs_df,
+		'wrongs_df':wrongs_df.get_df(),
 		'lcset_info':lcset_info,
 		'metrics_cdict':metrics_cdict,
 		'metrics_dict':metrics_dict,
 		'cm':cm,
-		'features':features,
-		'rank':rank,
+		'features':brf_d['features'],
+		'rank':brf_d['rank'],
+		}
+	return d
+
+
+
+
+
+
+
+
+def xxxxxxxxxxx(train_df_x, train_df_y,
+	nan_mode='value', # value, mean
+	):
+	min_population_samples = min(np.unique(train_df_y['_y'].values, return_counts=True)[-1])
+	brf_kwargs = { # same as ALERCE
+		'max_features':'auto', # None auto
+		'max_depth':None,
+		'n_jobs':C_.N_JOBS,
+		'class_weight':None,
+		'criterion':'entropy',
+		'min_samples_split':2,
+		'min_samples_leaf':1,
+
+		'n_estimators':500, # 500 1000 2000 5000
+		#'sampling_strategy':'not minority',
+		'sampling_strategy':'all',
+		'bootstrap':True,
+		'replacement':True,
+		'max_samples':10, # *** # 100 500 1000 min_population_samples
+		#'verbose':1,
+	}
+	brf = BalancedRandomForestClassifier(**brf_kwargs)
+	train_df_x, mean_train_df_x, null_cols = clean_df_nans(train_df_x, mode=NAN_MODE)
+	brf.fit(train_df_x.values, train_df_y[['_y']].values[...,0])
+	d = {
+		'brf':brf,
+		'mean_train_df_x':mean_train_df_x,
+		'null_cols':null_cols,
 		}
 	return d
