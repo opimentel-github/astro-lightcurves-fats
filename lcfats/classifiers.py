@@ -10,6 +10,7 @@ from flamingchoripan.datascience.metrics import get_multiclass_metrics
 from flamingchoripan.dataframes import clean_df_nans
 import numpy as np
 import random
+from flamingchoripan.dataframes import DFBuilder
 
 ###################################################################################################################################################
 
@@ -26,7 +27,7 @@ def train_classifier(train_df_x, train_df_y,
 		'min_samples_split':2,
 		'min_samples_leaf':1,
 
-		'n_estimators':10000, # 500 1000 2000
+		'n_estimators':10, # 500 1000 2000 10000
 		#'sampling_strategy':'not minority',
 		'sampling_strategy':'all',
 		'bootstrap':True,
@@ -56,11 +57,20 @@ def evaluate_classifier(brf_d, eval_df_x, eval_df_y, lcset_info,
 	y_target = eval_df_y[['_y']].values[...,0]
 	eval_df_x, _, _ = clean_df_nans(eval_df_x, mode=nan_mode, df_values=mean_train_df_x)
 	y_pred_p = brf.predict_proba(eval_df_x.values)
-
-	y_pred = np.argmax(y_pred_p, axis=-1)
-	wrongs_indexs = ~(y_target==y_pred)
-	wrongs_df = eval_df_y[wrongs_indexs]
 	metrics_cdict, metrics_dict, cm = get_multiclass_metrics(y_pred_p, y_target, class_names)
+
+	### wrong samples
+	y_pred = np.argmax(y_pred_p, axis=-1)
+	lcobj_names = list(eval_df_y.index)
+	wrong_classification = ~(y_target==y_pred)
+	assert len(lcobj_names)==len(wrong_classification)
+	wrongs_df = DFBuilder()
+	for kwc,wc in enumerate(wrong_classification):
+		if wc:
+			wrongs_df.append(lcobj_names[kwc], {'y_target':class_names[y_target[kwc]], 'y_pred':class_names[y_pred[kwc]]})
+	wrongs_df.get_df()
+	print(wrongs_df)
+	assert 0
 
 	### results
 	features = list(eval_df_x.columns)

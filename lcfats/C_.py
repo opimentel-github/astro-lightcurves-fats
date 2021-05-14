@@ -22,18 +22,18 @@ SNE_SELECTED_FEATURES = [
 	'SPM_tau_fall', # *
 	'SPM_beta', # *
 
-	#'LinearTrend', # *
-	#'IAR_phi', # *
-	#'MHPS_ratio', # *
-	#'GP_DRW_tau', # * slow
+	'LinearTrend', # *
+	'IAR_phi', # *
+	'MHPS_ratio', # *
+	'GP_DRW_tau', # * slow
 	#'GP_DRW_sigma', # slow
 
-	#'MHPS_low', # *
+	'MHPS_low', # *
 	#'MHPS_PN_flag',
 	#'MHPS_high',
 	#'MHPS_non_zero',
 
-	#'SF_ML_amplitude', # *
+	'SF_ML_amplitude', # *
 	]
 
 ALERCE_SPM_FEATURES = [
