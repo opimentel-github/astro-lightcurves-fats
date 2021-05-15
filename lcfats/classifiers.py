@@ -18,22 +18,22 @@ from flamingchoripan.dataframes import DFBuilder
 
 ###################################################################################################################################################
 
-NAN_MODE = 'median'
+NAN_MODE = 'value' # 'median'
 def train_classifier(train_df_x, train_df_y,
 	nan_mode='value', # value, mean
 	):
 	train_df_x, mean_train_df_x, null_cols = clean_df_nans(train_df_x, mode=NAN_MODE)
 	#min_population_samples = min(np.unique(train_df_y['_y'].values, return_counts=True)[-1])
-	rf_kwargs = { # same as ALERCE
+	rf_kwargs = {
 		'max_features':'auto', # None auto
-		'max_depth':2,
+		'max_depth':3,
 		'n_jobs':C_.N_JOBS,
 		'class_weight':None,
 		'criterion':'entropy',
 		'min_samples_split':2,
 		'min_samples_leaf':1,
 
-		'n_estimators':2000, # 500 1000 2000 5000
+		'n_estimators':1000, # 500 1000 2000 5000
 		'bootstrap':True,
 		#'max_samples':10, # *** # 100 500 1000 min_population_samples
 		#'verbose':1,
@@ -43,9 +43,9 @@ def train_classifier(train_df_x, train_df_y,
 	random_sampler = RandomOverSampler(sampling_strategy=sampling_strategy) # RandomOverSampler SMOTE
 	x_rs, y_rs = random_sampler.fit_resample(train_df_x.values, train_df_y[['_y']].values[...,0])
 	#brf = make_pipeline_imb(random_sampler, rf)
-	param_grid = {
-		'max_depth':[1,2,5,10,15,20],
-		}
+	#param_grid = {
+	#	'max_depth':[1,2,5,10,15,20],
+	#	}
 	#grid_clf = GridSearchCV(rf, param_grid, cv=5)
 	#grid_clf.fit(x_rs, y_rs)
 	#rf = grid_clf.best_estimator_
@@ -99,6 +99,11 @@ def evaluate_classifier(brf_d, eval_df_x, eval_df_y, lcset_info,
 		'rank':brf_d['rank'],
 		}
 	return d
+
+
+
+
+
 
 
 
