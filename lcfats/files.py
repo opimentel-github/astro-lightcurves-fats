@@ -29,10 +29,15 @@ def load_features(filedir,
 	if mode=='all':
 		return df_x, df_y
 
-	elif mode=='sne':
-		invalid_features = []
+	if mode=='sne':
 		query_features = get_multiband_features(C_.SNE_SELECTED_FEATURES)
-		invalid_features = get_multiband_features(invalid_features)
+		invalid_features = get_multiband_features([])
+		df_x = df_xy[[c for c in df_x.columns if c in query_features and not c in invalid_features]]
+		return df_x, df_y
+
+	if mode=='spm':
+		query_features = get_multiband_features([f for f in C_.SNE_SELECTED_FEATURES if 'SPM_' in f])
+		invalid_features = get_multiband_features([])
 		df_x = df_xy[[c for c in df_x.columns if c in query_features and not c in invalid_features]]
 		return df_x, df_y
 
