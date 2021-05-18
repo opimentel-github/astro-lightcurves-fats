@@ -66,9 +66,9 @@ if __name__== '__main__':
 				for c in [None]+class_names:
 					fig = plot_projections(maps2d_dict, lcdataset, lcset_name, c)
 					if c is None:
-						save_filedir = f'../save/umap/{cfilename}~method={method}/{lcset_name}/{get_string_from_dict(params)}.png'
+						save_filedir = f'../save/exp=umap~mode={main_args.mode}/{cfilename}~method={method}/{lcset_name}/{get_string_from_dict(params)}.png'
 					else:
-						save_filedir = f'../save/umap/{cfilename}~method={method}/{lcset_name}/{get_string_from_dict(params)}/{c}.png'
+						save_filedir = f'../save/exp=umap~mode={main_args.mode}/{cfilename}~method={method}/{lcset_name}/{get_string_from_dict(params)}/{c}.png'
 					save_fig(save_filedir, fig)
 					
 			bar.done()

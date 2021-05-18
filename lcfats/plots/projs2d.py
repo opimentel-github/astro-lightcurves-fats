@@ -102,8 +102,8 @@ def plot_projections(maps2d_dict, lcdataset, s_lcset_name,
 	title += f'{method_name}'+'\n'
 	title += f'survey={r_lcset.survey}-{"".join(r_lcset.band_names)} [{s_lcset_name}]'+'\n'
 	if len(rank_names)>0:
-		title += f'dist-rank=[{", ".join(rank_names)}]'+'\n'  
-	ax.legend()
+		title += f'real-synth top distance=[{", ".join(rank_names)}]'+'\n'  
+	ax.legend(loc='upper right', prop={"size":15})
 	ax.set_title(title[:-1])
 	ax.grid(alpha=0.25)
 	fig.tight_layout()
@@ -117,7 +117,7 @@ def plot_projections_c(ax, maps2d_dict, c,
 	uses_net=False,
 	net_alpha=0.25,
 	rank=3,
-	fontsize=12,
+	fontsize=14,
 	):
 	net_alpha = 0.05 if c in ['SNIa'] else net_alpha # fixme
 	map_lcobj_names = maps2d_dict['map_lcobj_names']
