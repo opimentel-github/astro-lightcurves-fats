@@ -5,8 +5,8 @@ from . import C_
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as PathEffects
-import flamingchoripan.cuteplots.colors as cc
-from flamingchoripan.datascience.ranks import TopRank
+import fuzzytools.cuteplots.colors as cc
+from fuzzytools.datascience.ranks import TopRank
 
 ###################################################################################################################################################
 

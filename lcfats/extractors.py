@@ -7,8 +7,8 @@ from .sn_parametric_model_computer import SNModelScipy, get_features_keys
 from turbofats import FeatureFunctionLib
 import numpy as np
 import pandas as pd
-from flamingchoripan.progress_bars import ProgressBar
-from flamingchoripan.lists import get_list_chunks
+from fuzzytools.progress_bars import ProgressBar
+from fuzzytools.lists import get_list_chunks
 from joblib import Parallel, delayed
 from .mhps_extractor import MHPSExtractor
 from scipy import stats

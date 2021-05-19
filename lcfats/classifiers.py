@@ -9,12 +9,12 @@ from imblearn.ensemble import BalancedRandomForestClassifier
 from imblearn.pipeline import make_pipeline as make_pipeline_imb
 from imblearn.under_sampling import RandomUnderSampler, ClusterCentroids
 from imblearn.over_sampling import RandomOverSampler, SMOTE
-from flamingchoripan.datascience.ranks import TopRank
-from flamingchoripan.datascience.metrics import get_multiclass_metrics
-from flamingchoripan.dataframes import clean_df_nans
+from fuzzytools.datascience.ranks import TopRank
+from fuzzytools.datascience.metrics import get_multiclass_metrics
+from fuzzytools.dataframes import clean_df_nans
 import numpy as np
 import random
-from flamingchoripan.dataframes import DFBuilder
+from fuzzytools.dataframes import DFBuilder
 
 ###################################################################################################################################################
 

@@ -3,7 +3,7 @@ from __future__ import division
 from . import C_
 
 import pandas as pd
-from flamingchoripan.files import create_dir
+from fuzzytools.files import create_dir
 import os
 
 ###################################################################################################################################################

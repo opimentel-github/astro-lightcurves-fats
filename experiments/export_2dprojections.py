@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 import sys
 sys.path.append('../') # or just install the module
-sys.path.append('../../flaming-choripan') # or just install the module
+sys.path.append('../../fuzzy-tools') # or just install the module
 sys.path.append('../../astro-lightcurves-handler') # or just install the module
 
 if __name__== '__main__':
 	### parser arguments
 	import argparse
-	from flamingchoripan.prints import print_big_bar
+	from fuzzytools.prints import print_big_bar
 
 	parser = argparse.ArgumentParser('usage description')
 	parser.add_argument('-method',  type=str, default='.', help='method')
@@ -18,7 +18,7 @@ if __name__== '__main__':
 
 	###################################################################################################################################################
 	import numpy as np
-	from flamingchoripan.files import load_pickle, save_pickle, get_dict_from_filedir
+	from fuzzytools.files import load_pickle, save_pickle, get_dict_from_filedir
 
 	filedir = f'../../surveys-save/survey=alerceZTFv7.1~bands=gr~mode=onlySNe.splcds'
 	filedict = get_dict_from_filedir(filedir)
@@ -33,10 +33,10 @@ if __name__== '__main__':
 	from lcfats.map2d import get_fitted_maps2d
 	import matplotlib.pyplot as plt
 	from lcfats.plots.projs2d import plot_projections
-	from flamingchoripan.progress_bars import ProgressBar
-	from flamingchoripan.cuteplots.utils import save_fig
-	from flamingchoripan.strings import get_string_from_dict
-	from flamingchoripan.datascience.grid_search import GDIter, GridSeacher
+	from fuzzytools.progress_bars import ProgressBar
+	from fuzzytools.cuteplots.utils import save_fig
+	from fuzzytools.strings import get_string_from_dict
+	from fuzzytools.datascience.grid_search import GDIter, GridSeacher
 
 	kfs = list(range(0, 5)) if main_args.kf=='.' else main_args.kf
 	kfs = [kfs] if isinstance(kfs, str) else kfs

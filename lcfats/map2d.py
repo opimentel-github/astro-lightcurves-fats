@@ -8,7 +8,7 @@ from sklearn.decomposition import PCA, KernelPCA, FastICA
 from sklearn.manifold import TSNE
 from umap import UMAP
 from .files import load_features
-from flamingchoripan.dataframes import clean_df_nans
+from fuzzytools.dataframes import clean_df_nans
 import pandas as pd
 
 ###################################################################################################################################################

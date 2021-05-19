@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 import sys
 sys.path.append('../') # or just install the module
-sys.path.append('../../flaming-choripan') # or just install the module
+sys.path.append('../../fuzzy-tools') # or just install the module
 sys.path.append('../../astro-lightcurves-handler') # or just install the module
 sys.path.append('../../astro-lightcurves-fats') # or just install the module
 
 if __name__== '__main__':
 	### parser arguments
 	import argparse
-	from flamingchoripan.prints import print_big_bar
+	from fuzzytools.prints import print_big_bar
 
 	parser = argparse.ArgumentParser('usage description')
 	parser.add_argument('-method',  type=str, default='.', help='method')
@@ -20,9 +20,9 @@ if __name__== '__main__':
 
 	###################################################################################################################################################
 	import numpy as np
-	from flamingchoripan.files import load_pickle, save_pickle, get_dict_from_filedir
+	from fuzzytools.files import load_pickle, save_pickle, get_dict_from_filedir
 	from lcfats.files import load_features
-	from flamingchoripan.progress_bars import ProgressBar
+	from fuzzytools.progress_bars import ProgressBar
 	from lcfats.classifiers import train_classifier, evaluate_classifier
 	import pandas as pd
 
