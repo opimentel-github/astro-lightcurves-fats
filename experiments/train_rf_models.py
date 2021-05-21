@@ -5,85 +5,84 @@ sys.path.append('../../fuzzy-tools') # or just install the module
 sys.path.append('../../astro-lightcurves-handler') # or just install the module
 sys.path.append('../../astro-lightcurves-fats') # or just install the module
 
-if __name__== '__main__':
-	### parser arguments
-	import argparse
-	from fuzzytools.prints import print_big_bar
+###################################################################################################################################################
+import argparse
+from fuzzytools.prints import print_big_bar
 
-	parser = argparse.ArgumentParser('usage description')
-	parser.add_argument('-method',  type=str, default='.', help='method')
-	parser.add_argument('-mids',  type=str, default='0-10', help='initial_id-final_id')
-	parser.add_argument('-mode',  type=str, default='all', help='mode')
-	parser.add_argument('-kf',  type=str, default='.', help='kf')
-	main_args = parser.parse_args()
-	print_big_bar()
+parser = argparse.ArgumentParser('usage description')
+parser.add_argument('-method',  type=str, default='.', help='method')
+parser.add_argument('-mids',  type=str, default='0-10', help='initial_id-final_id')
+parser.add_argument('-mode',  type=str, default='all', help='mode')
+parser.add_argument('-kf',  type=str, default='.', help='kf')
+main_args = parser.parse_args()
+print_big_bar()
 
-	###################################################################################################################################################
-	import numpy as np
-	from fuzzytools.files import load_pickle, save_pickle, get_dict_from_filedir
-	from lcfats.files import load_features
-	from fuzzytools.progress_bars import ProgressBar
-	from lcfats.classifiers import train_classifier, evaluate_classifier
-	import pandas as pd
+###################################################################################################################################################
+import numpy as np
+from fuzzytools.files import load_pickle, save_pickle, get_dict_from_filedir
+from lcfats.files import load_features
+from fuzzytools.progress_bars import ProgressBar
+from lcfats.classifiers import train_classifier, evaluate_classifier
+import pandas as pd
 
-	kfs = [str(kf) for kf in range(0, 5)] if main_args.kf=='.' else main_args.kf
-	kfs = [kfs] if isinstance(kfs, str) else kfs
-	#methods = ['linear-fstw', 'bspline-fstw', 'spm-mle-fstw', 'spm-mle-estw', 'spm-mcmc-fstw', 'spm-mcmc-estw'] if main_args.method=='.' else main_args.method
-	methods = ['linear-fstw', 'bspline-fstw', 'spm-mcmc-fstw', 'spm-mcmc-estw'] if main_args.method=='.' else main_args.method
-	methods = [methods] if isinstance(methods, str) else methods
+kfs = [str(kf) for kf in range(0, 5)] if main_args.kf=='.' else main_args.kf
+kfs = [kfs] if isinstance(kfs, str) else kfs
+#methods = ['linear-fstw', 'bspline-fstw', 'spm-mle-fstw', 'spm-mle-estw', 'spm-mcmc-fstw', 'spm-mcmc-estw'] if main_args.method=='.' else main_args.method
+methods = ['linear-fstw', 'bspline-fstw', 'spm-mcmc-fstw', 'spm-mcmc-estw'] if main_args.method=='.' else main_args.method
+methods = [methods] if isinstance(methods, str) else methods
 
-	for kf in kfs:
-		for method in methods:
-			filedir = f'../../surveys-save/survey=alerceZTFv7.1~bands=gr~mode=onlySNe~method={method}.splcds'
-			filedict = get_dict_from_filedir(filedir)
-			rootdir = filedict['_rootdir']
-			cfilename = filedict['_cfilename']
-			lcdataset = load_pickle(filedir)
-			lcset_info = lcdataset['raw'].get_info()
-			print(lcdataset)
+for kf in kfs:
+	for method in methods:
+		filedir = f'../../surveys-save/survey=alerceZTFv7.1~bands=gr~mode=onlySNe~method={method}.splcds'
+		filedict = get_dict_from_filedir(filedir)
+		rootdir = filedict['_rootdir']
+		cfilename = filedict['_cfilename']
+		lcdataset = load_pickle(filedir)
+		lcset_info = lcdataset['raw'].get_info()
+		print(lcdataset)
 
-			for train_config in ['r', 's', 'r+s']:
-			#for train_config in ['r', 's']:
-				###################################################################################################################################################
-				### IDS
-				model_ids = list(range(*[int(mi) for mi in main_args.mids.split('-')]))
-				bar = ProgressBar(len(model_ids))
-				for ki,model_id in enumerate(model_ids): # IDS
-					train_df_x_r, train_df_y_r = load_features(f'../save/fats/{cfilename}/{kf}@train.df', main_args.mode)
-					train_df_x_s, train_df_y_s = load_features(f'../save/fats/{cfilename}/{kf}@train.{method}.df', main_args.mode)
-					s_repeats = len(train_df_x_s)//len(train_df_x_r)
-					if train_config=='r':
-						train_df_x = pd.concat([train_df_x_r]*s_repeats*2, axis='rows')
-						train_df_y = pd.concat([train_df_y_r]*s_repeats*2, axis='rows')
+		for train_config in ['r', 's', 'r+s']:
+		#for train_config in ['r', 's']:
+			###################################################################################################################################################
+			### IDS
+			model_ids = list(range(*[int(mi) for mi in main_args.mids.split('-')]))
+			bar = ProgressBar(len(model_ids))
+			for ki,model_id in enumerate(model_ids): # IDS
+				train_df_x_r, train_df_y_r = load_features(f'../save/fats/{cfilename}/{kf}@train.df', main_args.mode)
+				train_df_x_s, train_df_y_s = load_features(f'../save/fats/{cfilename}/{kf}@train.{method}.df', main_args.mode)
+				s_repeats = len(train_df_x_s)//len(train_df_x_r)
+				if train_config=='r':
+					train_df_x = pd.concat([train_df_x_r]*s_repeats*2, axis='rows')
+					train_df_y = pd.concat([train_df_y_r]*s_repeats*2, axis='rows')
 
-					if train_config=='s':
-						train_df_x = pd.concat([train_df_x_s]*2, axis='rows')
-						train_df_y = pd.concat([train_df_y_s]*2, axis='rows')
+				if train_config=='s':
+					train_df_x = pd.concat([train_df_x_s]*2, axis='rows')
+					train_df_y = pd.concat([train_df_y_s]*2, axis='rows')
 
-					if train_config=='r+s':
-						train_df_x = pd.concat([train_df_x_r]*s_repeats+[train_df_x_s], axis='rows')
-						train_df_y = pd.concat([train_df_y_r]*s_repeats+[train_df_y_s], axis='rows')
+				if train_config=='r+s':
+					train_df_x = pd.concat([train_df_x_r]*s_repeats+[train_df_x_s], axis='rows')
+					train_df_y = pd.concat([train_df_y_r]*s_repeats+[train_df_y_s], axis='rows')
 
-					val_df_x, val_df_y = load_features(f'../save/fats/{cfilename}/{kf}@val.df', main_args.mode)
-					test_df_x, test_df_y = load_features(f'../save/fats/{cfilename}/{kf}@test.df', main_args.mode)
+				val_df_x, val_df_y = load_features(f'../save/fats/{cfilename}/{kf}@val.df', main_args.mode)
+				test_df_x, test_df_y = load_features(f'../save/fats/{cfilename}/{kf}@test.df', main_args.mode)
 
-					fit_kwargs = {}
-					features = list(train_df_x.columns)
-					brf_d = train_classifier(train_df_x, train_df_y, **fit_kwargs)
+				fit_kwargs = {}
+				features = list(train_df_x.columns)
+				brf_d = train_classifier(train_df_x, train_df_y, **fit_kwargs)
 
-					#results_val = evaluate_classifier(brf_d, val_df_x, val_df_y, lcset_info, **fit_kwargs)
-					#save_pickle(f'../save/exp=rf_eval~train_config={train_config}~mode={main_args.mode}/{cfilename}/{kf}@val/id={model_id}.df', results_val)
+				#results_val = evaluate_classifier(brf_d, val_df_x, val_df_y, lcset_info, **fit_kwargs)
+				#save_pickle(f'../save/exp=rf_eval~train_config={train_config}~mode={main_args.mode}/{cfilename}/{kf}@val/id={model_id}.df', results_val)
 
-					results_test = evaluate_classifier(brf_d, test_df_x, test_df_y, lcset_info, **fit_kwargs)
-					save_pickle(f'../save/exp=rf_eval~train_config={train_config}~mode={main_args.mode}/{cfilename}/{kf}@test/id={model_id}.df', results_test)
+				results_test = evaluate_classifier(brf_d, test_df_x, test_df_y, lcset_info, **fit_kwargs)
+				save_pickle(f'../save/exp=rf_eval~train_config={train_config}~mode={main_args.mode}/{cfilename}/{kf}@test/id={model_id}.df', results_test)
 
-					metrics_dict = results_test['metrics_dict']
-					#print(metrics_dict)
-					brecall = metrics_dict['b-recall']
-					bar(f'kf={kf} - mode={main_args.mode} - method={method} - train_config={train_config} - model_id={model_id} - b-recall={brecall} - samples={len(train_df_y)} - features=({len(features)}#){features}')
-					#assert 0
+				metrics_dict = results_test['metrics_dict']
+				#print(metrics_dict)
+				brecall = metrics_dict['b-recall']
+				bar(f'kf={kf} - mode={main_args.mode} - method={method} - train_config={train_config} - model_id={model_id} - b-recall={brecall} - samples={len(train_df_y)} - features=({len(features)}#){features}')
+				#assert 0
 
-				bar.done()
+			bar.done()
 
 
 
