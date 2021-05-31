@@ -171,12 +171,12 @@ def get_all_fat_features(lcdataset, lcset_name,
 	band_names = lcset.band_names
 	features_df = {}
 	labels_df = {}
-	chunks = get_list_chunks(lcset.get_lcobj_names(), chunk_size)
-	bar = ProgressBar(len(chunks))
-	for kc,chunk in enumerate(chunks):
-		bar(f'lcset_name={lcset_name} - chunk_size={chunk_size} - chunk={chunk}')
+	lcobj_names_chunks = get_list_chunks(lcset.get_lcobj_names(), chunk_size)
+	bar = ProgressBar(len(lcobj_names_chunks))
+	for lcobj_names_chunk in lcobj_names_chunks:
+		bar(f'lcset_name={lcset_name} - lcobj_names_chunk={lcobj_names_chunk}')
 		jobs = []
-		for lcobj_name in chunk:
+		for lcobj_name in lcobj_names_chunk:
 			jobs.append(delayed(get_features)(
 				lcobj_name,
 				lcset[lcobj_name],
@@ -184,7 +184,7 @@ def get_all_fat_features(lcdataset, lcset_name,
 				lcset.get_info(),
 			))
 		results = Parallel(n_jobs=n_jobs, backend=backend)(jobs)
-		for result, lcobj_name in zip(results, chunk):
+		for result, lcobj_name in zip(results, lcobj_names_chunk):
 			features_df[lcobj_name] = result
 			labels_df[lcobj_name] = {
 				'_y':lcset[lcobj_name].y,
