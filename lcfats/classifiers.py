@@ -16,11 +16,12 @@ import numpy as np
 import random
 from fuzzytools.dataframes import DFBuilder
 
+NAN_MODE = 'value' # value, mean
+
 ###################################################################################################################################################
 
-NAN_MODE = 'value' # 'median'
 def train_classifier(train_df_x, train_df_y,
-	nan_mode='value', # value, mean
+	nan_mode=NAN_MODE,
 	):
 	train_df_x, mean_train_df_x, null_cols = clean_df_nans(train_df_x, mode=NAN_MODE)
 	#min_population_samples = min(np.unique(train_df_y['_y'].values, return_counts=True)[-1])
@@ -68,7 +69,7 @@ def train_classifier(train_df_x, train_df_y,
 	return d
 
 def evaluate_classifier(brf_d, eval_df_x, eval_df_y, lcset_info,
-	nan_mode='value', # value, mean
+	nan_mode=NAN_MODE,
 	):
 	brf = brf_d['brf']
 	mean_train_df_x = brf_d['mean_train_df_x']
@@ -97,48 +98,5 @@ def evaluate_classifier(brf_d, eval_df_x, eval_df_y, lcset_info,
 		'cm':cm,
 		'features':brf_d['features'],
 		'rank':brf_d['rank'],
-		}
-	return d
-
-
-
-
-
-
-
-
-
-
-
-
-
-def xxxxxxxxxxx(train_df_x, train_df_y,
-	nan_mode='value', # value, mean
-	):
-	min_population_samples = min(np.unique(train_df_y['_y'].values, return_counts=True)[-1])
-	brf_kwargs = { # same as ALERCE
-		'max_features':'auto', # None auto
-		'max_depth':None,
-		'n_jobs':C_.N_JOBS,
-		'class_weight':None,
-		'criterion':'entropy',
-		'min_samples_split':2,
-		'min_samples_leaf':1,
-
-		'n_estimators':500, # 500 1000 2000 5000
-		#'sampling_strategy':'not minority',
-		'sampling_strategy':'all',
-		'bootstrap':True,
-		'replacement':True,
-		'max_samples':10, # *** # 100 500 1000 min_population_samples
-		#'verbose':1,
-	}
-	brf = BalancedRandomForestClassifier(**brf_kwargs)
-	train_df_x, mean_train_df_x, null_cols = clean_df_nans(train_df_x, mode=NAN_MODE)
-	brf.fit(train_df_x.values, train_df_y[['_y']].values[...,0])
-	d = {
-		'brf':brf,
-		'mean_train_df_x':mean_train_df_x,
-		'null_cols':null_cols,
 		}
 	return d
