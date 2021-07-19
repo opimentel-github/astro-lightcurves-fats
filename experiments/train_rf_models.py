@@ -42,12 +42,14 @@ for train_config in ['r', 's', 'r+s']:
 	train_df_x_s, train_df_y_s = load_features(f'../save/fats/{cfilename}/{main_args.kf}@train.{main_args.method}.df', main_args.mode)
 	s_repeats = len(train_df_x_s)//len(train_df_x_r)
 	if train_config=='r':
-		train_df_x = pd.concat([train_df_x_r]*s_repeats*2, axis='rows')
-		train_df_y = pd.concat([train_df_y_r]*s_repeats*2, axis='rows')
+		k = 1 # 1 s_repeats*2
+		train_df_x = pd.concat([train_df_x_r]*k, axis='rows')
+		train_df_y = pd.concat([train_df_y_r]*k, axis='rows')
 
 	if train_config=='s':
-		train_df_x = pd.concat([train_df_x_s]*2, axis='rows')
-		train_df_y = pd.concat([train_df_y_s]*2, axis='rows')
+		k = 1 # 1 2
+		train_df_x = pd.concat([train_df_x_s]*k, axis='rows')
+		train_df_y = pd.concat([train_df_y_s]*k, axis='rows')
 
 	if train_config=='r+s':
 		train_df_x = pd.concat([train_df_x_r]*s_repeats+[train_df_x_s], axis='rows')
@@ -59,13 +61,7 @@ for train_config in ['r', 's', 'r+s']:
 	brf_d = train_classifier(train_df_x, train_df_y, val_df_x, val_df_y, lcset_info, **fit_kwargs)
 
 	test_df_x, test_df_y = load_features(f'../save/fats/{cfilename}/{main_args.kf}@test.df', main_args.mode)
-	results_test = evaluate_classifier(brf_d, test_df_x, test_df_y, lcset_info, **fit_kwargs)
-	save_pickle(f'../save/exp=rf_eval~train_config={train_config}~mode={main_args.mode}/{cfilename}/{main_args.kf}@test/id={main_args.mid}.d', results_test)
-
-	metrics_dict = results_test['metrics_dict']
-	brecall = metrics_dict['b-recall']
-	print(f'features={features}({len(features)}#)')
-	print(f'samples={len(train_df_y)}; b-recall={brecall}')
-
-
-
+	d = evaluate_classifier(brf_d, test_df_x, test_df_y, lcset_info, **fit_kwargs)
+	save_rootdir = f'../save'
+	save_filedir = f'{save_rootdir}/exp=rf_eval~train_config={train_config}~mode={main_args.mode}/{cfilename}/{main_args.kf}@test/id={main_args.mid}.d'
+	save_pickle(save_filedir, d)
