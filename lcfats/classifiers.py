@@ -31,12 +31,13 @@ def train_classifier(_train_df_x, train_df_y, _val_df_x, val_df_y, lcset_info,
 	best_rf_metric = -np.inf
 	for criterion in ['gini', 'entropy']:
 		for max_depth in [1, 2, 4, 8, 16][::-1]:
-			for max_samples in [16, 32, 64, 128, 256, 1024]:
+			for max_samples in np.linspace(.1, .9, 6):
+			# for max_samples in [None]:
 				rf = BalancedRandomForestClassifier( # BalancedRandomForestClassifier RandomForestClassifier
 					n_jobs=N_JOBS,
 					criterion=criterion,
 					max_depth=max_depth,
-					n_estimators=256, # 256, 512, 1024, 2048
+					n_estimators=1024, # 10 256, 512, 1024, 2048
 					max_samples=max_samples,
 					max_features='auto', # None auto
 					# min_samples_split=min_samples_split,
@@ -102,6 +103,7 @@ def evaluate_classifier(rf_d, eval_df_x, eval_df_y, lcset_info,
 
 	d = {
 		'model_name':f'mdl=brf',
+		'survey':lcset_info['survey'],
 		'band_names':lcset_info['band_names'],
 		'class_names':class_names,
 		'lcobj_names':list(eval_df_y.index),
