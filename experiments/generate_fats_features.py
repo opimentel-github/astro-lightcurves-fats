@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*
 import sys
 sys.path.append('../') # or just install the module
 sys.path.append('../../fuzzy-tools') # or just install the module
@@ -8,9 +9,9 @@ sys.path.append('../../astro-lightcurves-handler') # or just install the module
 import argparse
 from fuzzytools.prints import print_big_bar
 
-parser = argparse.ArgumentParser('usage description')
-parser.add_argument('-method',  type=str, default='.', help='method')
-parser.add_argument('-kf',  type=str, default='.', help='kf')
+parser = argparse.ArgumentParser(prefix_chars='--')
+parser.add_argument('--method',  type=str, default='.', help='method')
+parser.add_argument('--kf',  type=str, default='.', help='kf')
 main_args = parser.parse_args()
 print_big_bar()
 
@@ -19,7 +20,7 @@ import numpy as np
 from fuzzytools.files import load_pickle, save_pickle
 from fuzzytools.files import get_dict_from_filedir
 
-kfs = [str(kf) for kf in range(0, 5)] if main_args.kf=='.' else main_args.kf
+kfs = lcdataset.kfolds if main_args.kf=='.' else main_args.kf
 kfs = [kfs] if isinstance(kfs, str) else kfs
 methods = ['linear-fstw', 'bspline-fstw', 'spm-mle-fstw', 'spm-mle-estw', 'spm-mcmc-fstw', 'spm-mcmc-estw'] if main_args.method=='.' else main_args.method
 methods = [methods] if isinstance(methods, str) else methods

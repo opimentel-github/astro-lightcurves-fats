@@ -15,52 +15,52 @@ from fuzzytools.dataframes import clean_df_nans
 import numpy as np
 import random
 from fuzzytools.dataframes import DFBuilder
+from nested_dict import nested_dict
 
 NAN_MODE = 'value' # value, mean
+N_JOBS = C_.N_JOBS
 
 ###################################################################################################################################################
 
-def train_classifier(train_df_x, train_df_y,
+def train_classifier(_train_df_x, train_df_y, _val_df_x, val_df_y, lcset_info,
 	nan_mode=NAN_MODE,
 	):
-	train_df_x, mean_train_df_x, null_cols = clean_df_nans(train_df_x, mode=NAN_MODE)
-	#min_population_samples = min(np.unique(train_df_y['_y'].values, return_counts=True)[-1])
-	rf_kwargs = {
-		'max_features':'auto', # None auto
-		'max_depth':3,
-		'n_jobs':C_.N_JOBS,
-		'class_weight':None,
-		'criterion':'entropy',
-		'min_samples_split':2,
-		'min_samples_leaf':1,
-
-		'n_estimators':1000, # 500 1000 2000 5000
-		'bootstrap':True,
-		#'max_samples':10, # *** # 100 500 1000 min_population_samples
-		#'verbose':1,
-	}
-	sampling_strategy = 'all' # not minority all
-	rf = RandomForestClassifier(**rf_kwargs)
-	random_sampler = RandomOverSampler(sampling_strategy=sampling_strategy) # RandomOverSampler SMOTE
+	class_names = lcset_info['class_names']
+	train_df_x, mean_train_df_x, null_cols = clean_df_nans(_train_df_x, mode=NAN_MODE)
+	random_sampler = RandomOverSampler( # RandomOverSampler SMOTE
+		sampling_strategy='all', # not minority all
+		)
 	x_rs, y_rs = random_sampler.fit_resample(train_df_x.values, train_df_y[['_y']].values[...,0])
-	#brf = make_pipeline_imb(random_sampler, rf)
-	#param_grid = {
-	#	'max_depth':[1,2,5,10,15,20],
-	#	}
-	#grid_clf = GridSearchCV(rf, param_grid, cv=5)
-	#grid_clf.fit(x_rs, y_rs)
-	#rf = grid_clf.best_estimator_
+	best_rf = (None, -np.inf)
+	for max_depth in [1, 2, 3, 4, 5]:
+		for min_samples_split in [2, 3, 4, 5]:
+			rf = RandomForestClassifier(
+				max_features='auto', # None auto
+				max_depth=max_depth,
+				n_jobs=N_JOBS,
+				class_weight=None,
+				criterion='entropy',
+				min_samples_split=min_samples_split,
+				min_samples_leaf=1,
+				n_estimators=1000, # 100 500 1000
+				bootstrap=True,
+				#verbose=1,
+				)
+			rf.fit(x_rs, y_rs)
+			val_df_x, _, _ = clean_df_nans(_val_df_x, mode=NAN_MODE, df_values=mean_train_df_x)
+			y_pred_p = rf.predict_proba(val_df_x.values)
+			y_target = val_df_y[['_y']].values[...,0]
+			metrics_cdict, metrics_dict, cm = get_multiclass_metrics(y_pred_p, y_target, class_names)
+			rf_metric = metrics_dict['b-f1score'] # recall f1score
+			if rf_metric>best_rf[-1]:
+				best_rf = (rf, rf_metric)
 	
-	rf.fit(x_rs, y_rs)
-	
-	#brf.fit(train_df_x.values, train_df_y[['_y']].values[...,0])
-
 	features = list(train_df_x.columns)
 	rank = TopRank('features')
 	rank.add_list(features, rf.feature_importances_)
 	rank.calcule()
 	d = {
-		'brf':rf,
+		'rf':best_rf[0],
 		'mean_train_df_x':mean_train_df_x,
 		'null_cols':null_cols,
 		'features':features,
@@ -68,15 +68,17 @@ def train_classifier(train_df_x, train_df_y,
 		}
 	return d
 
+###################################################################################################################################################
+
 def evaluate_classifier(brf_d, eval_df_x, eval_df_y, lcset_info,
 	nan_mode=NAN_MODE,
 	):
-	brf = brf_d['brf']
+	rf = brf_d['rf']
 	mean_train_df_x = brf_d['mean_train_df_x']
 	class_names = lcset_info['class_names']
 	y_target = eval_df_y[['_y']].values[...,0]
 	eval_df_x, _, _ = clean_df_nans(eval_df_x, mode=NAN_MODE, df_values=mean_train_df_x)
-	y_pred_p = brf.predict_proba(eval_df_x.values)
+	y_pred_p = rf.predict_proba(eval_df_x.values)
 	metrics_cdict, metrics_dict, cm = get_multiclass_metrics(y_pred_p, y_target, class_names)
 
 	### wrong samples
