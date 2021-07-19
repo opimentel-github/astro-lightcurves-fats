@@ -31,36 +31,41 @@ def train_classifier(_train_df_x, train_df_y, _val_df_x, val_df_y, lcset_info,
 		sampling_strategy='all', # not minority all
 		)
 	x_rs, y_rs = random_sampler.fit_resample(train_df_x.values, train_df_y[['_y']].values[...,0])
-	best_rf = (None, -np.inf)
-	for max_depth in [1, 2, 3, 4, 5]:
-		for min_samples_split in [2, 3, 4, 5]:
-			rf = RandomForestClassifier(
-				max_features='auto', # None auto
-				max_depth=max_depth,
-				n_jobs=N_JOBS,
-				class_weight=None,
-				criterion='entropy',
-				min_samples_split=min_samples_split,
-				min_samples_leaf=1,
-				n_estimators=1000, # 100 500 1000
-				bootstrap=True,
-				#verbose=1,
-				)
-			rf.fit(x_rs, y_rs)
-			val_df_x, _, _ = clean_df_nans(_val_df_x, mode=NAN_MODE, df_values=mean_train_df_x)
-			y_pred_p = rf.predict_proba(val_df_x.values)
-			y_target = val_df_y[['_y']].values[...,0]
-			metrics_cdict, metrics_dict, cm = get_multiclass_metrics(y_pred_p, y_target, class_names)
-			rf_metric = metrics_dict['b-f1score'] # recall f1score
-			if rf_metric>best_rf[-1]:
-				best_rf = (rf, rf_metric)
+	best_rf = None
+	best_rf_metric = -np.inf
+	for criterion in ['gini', 'entropy']:
+		for max_depth in [8, 16, 32][::-1]:
+			for n_estimators in [256, 512, 1024, 2048]:
+				rf = RandomForestClassifier(
+					n_jobs=N_JOBS,
+					criterion=criterion,
+					max_depth=max_depth,
+					n_estimators=n_estimators,
+					max_features='auto', # None auto
+					# class_weight=None,
+					# min_samples_split=min_samples_split,
+					bootstrap=True,
+					#verbose=1,
+					)
+				rf.fit(x_rs, y_rs)
+				val_df_x, _, _ = clean_df_nans(_val_df_x, mode=NAN_MODE, df_values=mean_train_df_x)
+				y_pred_p = rf.predict_proba(val_df_x.values)
+				y_target = val_df_y[['_y']].values[...,0]
+				metrics_cdict, metrics_dict, cm = get_multiclass_metrics(y_pred_p, y_target, class_names)
+				rf_metric = metrics_dict['b-f1score'] # recall f1score
+				print(f'criterion={criterion}; max_depth={max_depth}; n_estimators={n_estimators}; rf_metric={rf_metric}; best_rf_metric={best_rf_metric}')
+				if rf_metric>best_rf_metric:
+					best_rf = rf
+					best_rf_metric = rf_metric
 	
+	### save best
 	features = list(train_df_x.columns)
 	rank = TopRank('features')
-	rank.add_list(features, rf.feature_importances_)
+	rank.add_list(features, best_rf.feature_importances_)
 	rank.calcule()
+	print(rank)
 	d = {
-		'rf':best_rf[0],
+		'rf':best_rf,
 		'mean_train_df_x':mean_train_df_x,
 		'null_cols':null_cols,
 		'features':features,
